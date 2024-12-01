@@ -7,8 +7,8 @@ import * as bcrypt from 'bcrypt';
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
+
   async create(createUserDto: CreateUserDto) {
-    // Encrypt the password before saving the user
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     const result = await this.prisma.user.create({
       data: {
@@ -41,15 +41,23 @@ export class UsersService {
 
   async update(id: number, updateUserDto: UpdateUserDto) {
     const { password, ...data } = updateUserDto;
-    return await this.prisma.user.update({
+    const { password: pass, ...user } = await this.prisma.user.update({
       where: { id },
       data,
     });
+
+    return user;
   }
 
   async remove(id: number) {
-    return await this.prisma.user.delete({
-      where: { id },
-    });
+    const result = await this.prisma.user
+      .delete({
+        where: { id },
+      })
+      .then(() => true)
+      .catch(() => false);
+
+    if (!result) throw new NotFoundException('User not found');
+    return { success: true };
   }
 }
