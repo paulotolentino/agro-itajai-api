@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { SignInDto } from './dto/signIn';
+import { InternalServerError, NotAuthorizedError } from 'src/CommonErrors';
 
 // Mocked users
 const users = [
@@ -24,7 +25,7 @@ export class AuthService {
           user.password === signInDto.password,
       );
       if (!user) {
-        return { error: 'Not Authorized' };
+        throw new NotAuthorizedError();
       }
       const payload = { username: user.username, sub: user.id };
 
@@ -34,8 +35,11 @@ export class AuthService {
         access_token: this.jwtService.sign(payload),
       };
     } catch (error) {
-      console.log(error);
-      return { error: 'Not Authorized' };
+      if (error instanceof NotAuthorizedError) {
+        throw new NotAuthorizedError();
+      }
+      console.error(error);
+      throw new InternalServerError();
     }
   }
 
