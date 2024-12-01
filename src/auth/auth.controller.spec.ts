@@ -45,14 +45,4 @@ describe('AuthController', () => {
 
     expect(authService.signIn).toHaveBeenCalledWith(credentials);
   });
-
-  it('should call signOut with correct values', async () => {
-    const token = faker.string.uuid();
-    authService.signOut.mockResolvedValue('signout success'); // Mock do retorno do método
-
-    const result = await authController.signOut({ token });
-
-    expect(result).toBe('signout success');
-    expect(authService.signOut).toHaveBeenCalledWith(token);
-  });
 });

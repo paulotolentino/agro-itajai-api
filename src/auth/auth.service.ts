@@ -22,11 +22,11 @@ export class AuthService {
     if (!user || !(await bcrypt.compare(signInDto.password, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    const payload = { username: user.username, sub: user.id };
 
     // TODO Log successful sign in
 
     try {
+      const payload = { username: user.username, sub: user.id };
       return {
         access_token: this.jwtService.sign(payload),
       };
