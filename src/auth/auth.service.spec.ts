@@ -39,11 +39,12 @@ describe('AuthService', () => {
   });
 
   it('should return a Not Authorized error', async () => {
-    const result = await service.signIn({
-      username: 'johndoe',
-      password: 'invalid-password',
-    });
-    expect(result).toEqual({ error: 'Not Authorized' });
+    await expect(
+      service.signIn({
+        username: 'johndoe',
+        password: 'invalid-password',
+      }),
+    ).rejects.toThrow('Invalid credentials');
   });
 
   it('should log out a logged user', async () => {

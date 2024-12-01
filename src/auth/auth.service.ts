@@ -1,7 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { SignInDto } from './dto/signIn';
-import { InternalServerError, NotAuthorizedError } from 'src/CommonErrors';
 
 // Mocked users
 const users = [
@@ -18,28 +21,25 @@ export class AuthService {
   constructor(private jwtService: JwtService) {}
   async signIn(signInDto: SignInDto) {
     // TODO Log signIn attempt
+    const user = users.find(
+      (user) =>
+        user.username === signInDto.username &&
+        user.password === signInDto.password,
+    );
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+    const payload = { username: user.username, sub: user.id };
+
+    // TODO Log successful sign in
+
     try {
-      const user = users.find(
-        (user) =>
-          user.username === signInDto.username &&
-          user.password === signInDto.password,
-      );
-      if (!user) {
-        throw new NotAuthorizedError();
-      }
-      const payload = { username: user.username, sub: user.id };
-
-      // TODO Log successful sign in
-
       return {
         access_token: this.jwtService.sign(payload),
       };
     } catch (error) {
-      if (error instanceof NotAuthorizedError) {
-        throw new NotAuthorizedError();
-      }
       console.error(error);
-      throw new InternalServerError();
+      throw new InternalServerErrorException();
     }
   }
 
