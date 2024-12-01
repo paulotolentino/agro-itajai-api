@@ -1,7 +1,6 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Get, Request } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignInDto } from './dto/signIn';
-import { SignOutDto } from './dto/signOut';
 
 @Controller('auth')
 export class AuthController {
@@ -12,8 +11,10 @@ export class AuthController {
     return this.authService.signIn(signInDto);
   }
 
-  @Post('signout')
-  async signOut(@Body() signOutDto: SignOutDto) {
-    return await this.authService.signOut(signOutDto.token);
+  @Get('signout')
+  async signOut(@Request() req) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader.split(' ')[1];
+    return await this.authService.signOut(token);
   }
 }
