@@ -1,12 +1,10 @@
 import { Module } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
-import { JwtModule } from '@nestjs/jwt';
-import secretsConfig from 'src/secretsConfig';
+import { PrismaService } from '../prisma/prisma.service';
 
-const jwtConfig = secretsConfig().jwt;
 @Module({
   controllers: [UsersController],
-  providers: [UsersService],
+  providers: [UsersService, PrismaService],
 })
 export class UsersModule {}
