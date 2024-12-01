@@ -6,6 +6,9 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
+// Invalidate the token by adding it to a blacklist
+export const blacklistedTokens = new Set<string>();
+
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(private readonly jwtService: JwtService) {}
@@ -23,10 +26,14 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException('Token not found');
     }
 
+    // Check if the token is blacklisted
+    if (blacklistedTokens.has(token)) {
+      throw new UnauthorizedException('Token is invalidated');
+    }
+
     try {
       const decoded = this.jwtService.verify(token);
       request.user = decoded;
-      console.log(request.user);
       return true;
     } catch (err) {
       throw new UnauthorizedException('Invalid or expired token');

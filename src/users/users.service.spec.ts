@@ -35,14 +35,17 @@ describe('UsersService', () => {
 
   describe('create', () => {
     it('should create a user', async () => {
+      // provavelmente precisamos mockar o retorno do bcrypt
       const dto = {
         username: 'johndoe',
         name: 'John Doe',
         email: 'john@example.com',
-        password: '123456',
+        password:
+          '$2b$10$UmLxOInGzVCPUJnv967YX.Apr7HmegzcuvlQZFkocAlLCaHKVCSo6',
       };
       const expectedResult = { id: 1, ...dto };
 
+      (prisma.user.create as jest.Mock).mockResolvedValue(expectedResult);
       (prisma.user.create as jest.Mock).mockResolvedValue(expectedResult);
 
       const result = await service.create(dto);
