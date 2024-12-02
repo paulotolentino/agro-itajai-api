@@ -23,14 +23,27 @@ model User {
   CashIns      CashIn[]
   CashOuts     CashOut[]
   StockEntries StockEntry[] // Relacionamento com entradas de estoque
+  Status       UserStatus?  @relation(fields: [statusId], references: [id])
+  statusId     Int?
+  active       Boolean      @default(true)
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 }
 
+model UserStatus {
+  id        Int      @id @default(autoincrement())
+  name      String
+  Users     User[]
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Brand {
   id        Int       @id @default(autoincrement())
-  name      String
+  name      String    @unique
   products  Product[]
+  active    Boolean   @default(true)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
@@ -47,6 +60,7 @@ model Product {
   Orders       OrderItem[]
   StockEntries StockEntry[] // Relacionamento com entradas de estoque
   PriceHistory ProductPriceHistory[]
+  active       Boolean               @default(true)
   createdAt    DateTime              @default(now())
   updatedAt    DateTime              @updatedAt
 }
@@ -58,12 +72,22 @@ model Order {
   total         Float
   refunds       Refund[]
   items         OrderItem[]
-  status        String
+  status        OrderStatus @relation(fields: [statusId], references: [id])
+  statusId      Int
   discount      Float
   PaymentType   PaymentType @relation(fields: [paymentTypeId], references: [id])
   paymentTypeId Int
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
+}
+
+model OrderStatus {
+  id        Int      @id @default(autoincrement())
+  name      String
+  Orders    Order[]
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model OrderItem {
@@ -81,6 +105,7 @@ model PaymentType {
   id        Int      @id @default(autoincrement())
   name      String
   Orders    Order[]
+  active    Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
