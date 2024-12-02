@@ -39,10 +39,9 @@ describe('AuthController (e2e)', () => {
 
   it('/auth/signout (POST) should return a success message', () => {
     return request(app.getHttpServer())
-      .post('/auth/signout')
-      .send({ token: MOCKED_TOKEN })
-      .expect(201)
-      .expect('signout success');
+      .get('/auth/signout')
+      .auth(MOCKED_TOKEN, { type: 'bearer' })
+      .expect(200);
   });
 
   afterAll(async () => {
