@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { JwtModule } from '@nestjs/jwt';
+import { BrandsModule } from './brands/brands.module';
 import secretsConfig from './secretsConfig';
 
 const jwtConfig = secretsConfig().jwt;
@@ -16,6 +17,7 @@ const jwtConfig = secretsConfig().jwt;
       signOptions: { expiresIn: jwtConfig.expiresIn },
       global: true,
     }),
+    BrandsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
