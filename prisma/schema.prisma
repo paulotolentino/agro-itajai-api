@@ -15,18 +15,130 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  username  String   @unique
+  id           Int          @id @default(autoincrement())
+  username     String       @unique
+  name         String
+  password     String
+  Orders       Order[]
+  CashIns      CashIn[]
+  CashOuts     CashOut[]
+  StockEntries StockEntry[] // Relacionamento com entradas de estoque
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+model Brand {
+  id        Int       @id @default(autoincrement())
   name      String
-  password  String
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Product {
+  id           Int                   @id @default(autoincrement())
+  name         String
+  description  String?
+  price        Float // Preço de venda
+  averageCost  Float // Custo médio ponderado
+  brand        Brand?                @relation(fields: [brandId], references: [id])
+  brandId      Int?
+  stock        Int                   @default(0) // Estoque total disponível
+  Orders       OrderItem[]
+  StockEntries StockEntry[] // Relacionamento com entradas de estoque
+  PriceHistory ProductPriceHistory[]
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+}
+
+model Order {
+  id            Int         @id @default(autoincrement())
+  user          User        @relation(fields: [userId], references: [id])
+  userId        Int
+  total         Float
+  refunds       Refund[]
+  items         OrderItem[]
+  status        String
+  discount      Float
+  PaymentType   PaymentType @relation(fields: [paymentTypeId], references: [id])
+  paymentTypeId Int
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  order     Order    @relation(fields: [orderId], references: [id])
+  orderId   Int
+  product   Product  @relation(fields: [productId], references: [id])
+  productId Int
+  quantity  Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-// model Product {
-//   id          Int      @id @default(autoincrement())
-//   name        String
-//   description String?
-//   price       Float
-//   createdAt   DateTime @default(now())
-// }
+model PaymentType {
+  id        Int      @id @default(autoincrement())
+  name      String
+  Orders    Order[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DebitPayment {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  amount    Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Refund {
+  id        Int      @id @default(autoincrement())
+  order     Order    @relation(fields: [orderId], references: [id])
+  orderId   Int
+  amount    Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CashOut {
+  id          Int      @id @default(autoincrement())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      Int
+  description String?
+  amount      Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model CashIn {
+  id          Int      @id @default(autoincrement())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      Int
+  description String?
+  amount      Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model StockEntry {
+  id        Int      @id @default(autoincrement())
+  product   Product  @relation(fields: [productId], references: [id])
+  productId Int
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  quantity  Int // Quantidade de produtos adicionados
+  unitCost  Float // Preço unitário de compra
+  totalCost Float // Preço total da entrada (calculado)
+  createdAt DateTime @default(now())
+}
+
+model ProductPriceHistory {
+  id        Int      @id @default(autoincrement())
+  product   Product  @relation(fields: [productId], references: [id])
+  productId Int
+  oldPrice  Float
+  newPrice  Float
+  changedAt DateTime @default(now())
+}
