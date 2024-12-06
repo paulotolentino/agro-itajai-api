@@ -11,6 +11,7 @@ import { CashInModule } from './cash-in/cash-in.module';
 import { CashOutModule } from './cash-out/cash-out.module';
 import { ProductsModule } from './products/products.module';
 import { CategoriesModule } from './categories/categories.module';
+import { ProductPriceHistoryModule } from './product-price-history/product-price-history.module';
 import secretsConfig from './secretsConfig';
 
 const jwtConfig = secretsConfig().jwt;
@@ -30,6 +31,7 @@ const jwtConfig = secretsConfig().jwt;
     CashOutModule,
     ProductsModule,
     CategoriesModule,
+    ProductPriceHistoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

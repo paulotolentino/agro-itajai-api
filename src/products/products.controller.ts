@@ -1,19 +1,19 @@
 import {
   Controller,
   Get,
-  Post,
-  Body,
-  Patch,
+  // Post,
+  // Body,
+  // Patch,
   Param,
   Delete,
   UseGuards,
-  Req,
+  // Req,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+// import { CreateProductDto } from './dto/create-product.dto';
+// import { UpdateProductDto } from './dto/update-product.dto';
 import { AuthGuard } from 'src/common/guards/auth.guard';
-import { AuthorizedRequest } from 'src/types/global';
+// import { AuthorizedRequest } from 'src/types/global';
 
 @Controller('products')
 @UseGuards(AuthGuard) // Aplica o guard em todas as rotas deste controlador
@@ -42,10 +42,10 @@ export class ProductsController {
     return this.productsService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-    return this.productsService.update(+id, updateProductDto);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
+  //   return this.productsService.update(+id, updateProductDto);
+  // }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
