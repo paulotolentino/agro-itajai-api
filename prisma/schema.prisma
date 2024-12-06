@@ -29,6 +29,7 @@ model User {
   CreatedCashOuts              CashOut[]             @relation("CreatedBy")
   CreatedStockEntries          StockEntry[]          @relation("CreatedBy")
   CreatedProductPriceHistories ProductPriceHistory[] @relation("CreatedBy")
+  CreatedCategories            Category[]            @relation("CreatedBy")
   Status                       UserStatus?           @relation(fields: [statusId], references: [id])
   statusId                     Int?
   active                       Boolean               @default(true)
@@ -98,8 +99,22 @@ model Product {
   active       Boolean               @default(true)
   CreatedBy    User                  @relation("CreatedBy", fields: [createdById], references: [id])
   createdById  Int
+  Category     Category              @relation(fields: [categoryId], references: [id])
+  categoryId   Int
   createdAt    DateTime              @default(now())
   updatedAt    DateTime              @updatedAt
+}
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  Products    Product[]
+  active      Boolean   @default(true)
+  CreatedBy   User      @relation("CreatedBy", fields: [createdById], references: [id])
+  createdById Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model Order {

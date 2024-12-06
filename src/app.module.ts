@@ -9,6 +9,8 @@ import { PaymentTypeModule } from './payment-type/payment-type.module';
 import { CustomersModule } from './customers/customers.module';
 import { CashInModule } from './cash-in/cash-in.module';
 import { CashOutModule } from './cash-out/cash-out.module';
+import { ProductsModule } from './products/products.module';
+import { CategoriesModule } from './categories/categories.module';
 import secretsConfig from './secretsConfig';
 
 const jwtConfig = secretsConfig().jwt;
@@ -26,6 +28,8 @@ const jwtConfig = secretsConfig().jwt;
     CustomersModule,
     CashInModule,
     CashOutModule,
+    ProductsModule,
+    CategoriesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
