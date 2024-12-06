@@ -23,7 +23,21 @@ export class UsersService {
   }
 
   async findAll() {
-    const users = await this.prisma.user.findMany(); // Retorna todos os usuários
+    const users = await this.prisma.user.findMany({
+      include: {
+        CreatedBrands: true,
+        CreatedCashIns: true,
+        CreatedCashOuts: true,
+        CreatedCustomers: true,
+        CreatedProducts: true,
+        CreatedOrders: true,
+        CreatedDebitPayment: true,
+        CreatedProductPriceHistories: true,
+        CreatedRefunds: true,
+        CreatedStockEntries: true,
+        Status: true,
+      },
+    }); // Retorna todos os usuários
     const formattedUsers = users.map((user) => {
       const { password, ...formattedUser } = user;
       return formattedUser;
@@ -33,6 +47,19 @@ export class UsersService {
   async findOne(id: number) {
     const user = await this.prisma.user.findUnique({
       where: { id },
+      include: {
+        CreatedBrands: true,
+        CreatedCashIns: true,
+        CreatedCashOuts: true,
+        CreatedCustomers: true,
+        CreatedProducts: true,
+        CreatedOrders: true,
+        CreatedDebitPayment: true,
+        CreatedProductPriceHistories: true,
+        CreatedRefunds: true,
+        CreatedStockEntries: true,
+        Status: true,
+      },
     });
     if (!user) throw new NotFoundException('User not found');
     const { password, ...result } = user;
