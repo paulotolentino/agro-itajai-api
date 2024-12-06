@@ -35,6 +35,7 @@ export class UsersService {
         CreatedProductPriceHistories: true,
         CreatedRefunds: true,
         CreatedStockEntries: true,
+        CreatedCategories: true,
         Status: true,
       },
     }); // Retorna todos os usuários
@@ -58,6 +59,7 @@ export class UsersService {
         CreatedProductPriceHistories: true,
         CreatedRefunds: true,
         CreatedStockEntries: true,
+        CreatedCategories: true,
         Status: true,
       },
     });
