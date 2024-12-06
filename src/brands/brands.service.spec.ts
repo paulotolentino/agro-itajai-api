@@ -36,11 +36,15 @@ describe('BrandsService', () => {
 
   describe('create', () => {
     it('should create a brand', async () => {
-      const createBrandDto: CreateBrandDto = { name: 'Test Brand' };
+      const createBrandDto: CreateBrandDto = {
+        name: 'Test Brand',
+        createdById: 1,
+      };
       const createdBrand = {
         id: 1,
         name: 'Test Brand',
         active: true,
+        createdById: 1,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
