@@ -47,7 +47,6 @@ describe('UsersService', () => {
       const expectedResult = { id: 1, ...dto };
 
       (prisma.user.create as jest.Mock).mockResolvedValue(expectedResult);
-      (prisma.user.create as jest.Mock).mockResolvedValue(expectedResult);
 
       const result = await service.create(dto);
 
