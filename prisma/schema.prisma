@@ -48,6 +48,7 @@ model UserStatus {
 model Customer {
   id           Int            @id @default(autoincrement())
   name         String
+  apelido      String?
   cpf          String?
   phone        String?
   observation  String?

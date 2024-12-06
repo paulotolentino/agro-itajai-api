@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { BrandsModule } from './brands/brands.module';
 import { PaymentTypeModule } from './payment-type/payment-type.module';
+import { CustomersModule } from './customers/customers.module';
 import secretsConfig from './secretsConfig';
 
 const jwtConfig = secretsConfig().jwt;
@@ -20,6 +21,7 @@ const jwtConfig = secretsConfig().jwt;
     }),
     BrandsModule,
     PaymentTypeModule,
+    CustomersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
