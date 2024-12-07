@@ -23,7 +23,6 @@ model User {
   CreatedBrands                Brand[]               @relation("CreatedBy")
   CreatedProducts              Product[]             @relation("CreatedBy")
   CreatedOrders                Order[]               @relation("CreatedBy")
-  CreatedRefunds               Refund[]              @relation("CreatedBy")
   CreatedDebitPayment          DebitPayment[]        @relation("CreatedBy")
   CreatedCashIns               CashIn[]              @relation("CreatedBy")
   CreatedCashOuts              CashOut[]             @relation("CreatedBy")
@@ -31,6 +30,7 @@ model User {
   CreatedProductPriceHistories ProductPriceHistory[] @relation("CreatedBy")
   CreatedCategories            Category[]            @relation("CreatedBy")
   CreatedCashBalances          CashBalance[]         @relation("CreatedBy")
+  UpdatedSettings              Settings?
   Status                       UserStatus?           @relation(fields: [statusId], references: [id])
   statusId                     Int?
   active                       Boolean               @default(true)
@@ -95,7 +95,7 @@ model Product {
   averageCost  Float // Custo médio ponderado
   Brand        Brand?                @relation(fields: [brandId], references: [id])
   brandId      Int?
-  stock        Int                   @default(0) // Estoque total disponível
+  stock        Float                 @default(0) // Estoque total disponível
   Orders       OrderItem[]
   StockEntries StockEntry[] // Relacionamento com entradas de estoque
   PriceHistory ProductPriceHistory[]
@@ -123,15 +123,17 @@ model Category {
 model Order {
   id            Int         @id @default(autoincrement())
   total         Float
-  Refunds       Refund[]
   Items         OrderItem[]
-  status        OrderStatus @relation(fields: [statusId], references: [id])
+  CashBalance   CashBalance @relation(fields: [cashBalanceId], references: [id])
+  cashBalanceId Int
+  Status        OrderStatus @relation(fields: [statusId], references: [id])
   statusId      Int
   discount      Float
   PaymentType   PaymentType @relation(fields: [paymentTypeId], references: [id])
   paymentTypeId Int
   Customer      Customer?   @relation(fields: [customerId], references: [id])
   customerId    Int?
+  date          DateTime
   CreatedBy     User        @relation("CreatedBy", fields: [createdById], references: [id])
   createdById   Int
   createdAt     DateTime    @default(now())
@@ -151,9 +153,10 @@ model OrderItem {
   id        Int      @id @default(autoincrement())
   Order     Order    @relation(fields: [orderId], references: [id])
   orderId   Int
+  unitPrice Float
   Product   Product  @relation(fields: [productId], references: [id])
   productId Int
-  quantity  Int
+  quantity  Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -171,17 +174,6 @@ model DebitPayment {
   id          Int      @id @default(autoincrement())
   Customer    Customer @relation(fields: [customerId], references: [id])
   customerId  Int
-  amount      Float
-  CreatedBy   User     @relation("CreatedBy", fields: [createdById], references: [id])
-  createdById Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
-model Refund {
-  id          Int      @id @default(autoincrement())
-  Order       Order    @relation(fields: [orderId], references: [id])
-  orderId     Int
   amount      Float
   CreatedBy   User     @relation("CreatedBy", fields: [createdById], references: [id])
   createdById Int
@@ -219,7 +211,7 @@ model StockEntry {
   productId   Int
   CreatedBy   User     @relation("CreatedBy", fields: [createdById], references: [id])
   createdById Int
-  quantity    Int // Quantidade de produtos adicionados
+  quantity    Float // Quantidade de produtos adicionados
   unitPrice   Float // Preço unitário de venda
   unitCost    Float // Preço unitário de compra
   totalCost   Float // Preço total da entrada (calculado)
@@ -244,6 +236,7 @@ model ProductPriceHistory {
 model CashBalance {
   id          Int       @id @default(autoincrement())
   amount      Float
+  Orders      Order[]
   CreatedBy   User      @relation("CreatedBy", fields: [createdById], references: [id])
   createdById Int
   CashIns     CashIn[]
@@ -252,4 +245,13 @@ model CashBalance {
   closed      Boolean   @default(false)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+}
+
+model Settings {
+  id                Int      @id @default(autoincrement())
+  daysToExpireDebit Int
+  UpdatedBy         User?    @relation(fields: [updatedById], references: [id])
+  updatedById       Int?     @unique
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }

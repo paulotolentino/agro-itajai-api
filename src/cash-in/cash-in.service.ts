@@ -3,7 +3,7 @@ import { CreateCashInDto } from './dto/create-cash-in.dto';
 import { UpdateCashInDto } from './dto/update-cash-in.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CashBalanceService } from 'src/cash-balance/cash-balance.service';
-import { createdBy } from 'src/createdByUser';
+import { createdBy } from 'src/utils/createdByUser';
 
 @Injectable()
 export class CashInService {
@@ -60,21 +60,51 @@ export class CashInService {
   }
 
   async update(id: number, updateCashInDto: UpdateCashInDto) {
-    await this.findOne(id);
-    return await this.prismaService.cashIn.update({
-      where: { id },
-      data: {
-        amount: updateCashInDto.amount,
-        description: updateCashInDto.description,
-        createdById: updateCashInDto.createdById,
-      },
+    const cashIn = await this.findOne(id);
+
+    await this.prismaService.$transaction(async (tx) => {
+      await tx.cashIn.update({
+        where: { id },
+        data: {
+          amount: updateCashInDto.amount,
+          description: updateCashInDto.description,
+          createdById: updateCashInDto.createdById,
+        },
+      });
+      if (cashIn.amount !== updateCashInDto.amount) {
+        await tx.cashBalance.update({
+          where: { id: cashIn.cashBalanceId },
+          data: {
+            amount: {
+              increment: updateCashInDto.amount,
+              decrement: cashIn.amount,
+            },
+          },
+        });
+      }
     });
   }
 
   async remove(id: number) {
     await this.findOne(id);
-    return await this.prismaService.cashIn.delete({
-      where: { id },
+    return await this.prismaService.$transaction(async (tx) => {
+      const cashIn = await tx.cashIn.findUnique({
+        where: { id },
+        include: { CashBalance: true },
+      });
+
+      await tx.cashBalance.update({
+        where: { id: cashIn.cashBalanceId },
+        data: {
+          amount: {
+            decrement: cashIn.amount,
+          },
+        },
+      });
+
+      return await tx.cashIn.delete({
+        where: { id },
+      });
     });
   }
 }

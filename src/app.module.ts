@@ -14,6 +14,8 @@ import { CategoriesModule } from './categories/categories.module';
 import { ProductPriceHistoryModule } from './product-price-history/product-price-history.module';
 import { StockEntriesModule } from './stock-entries/stock-entries.module';
 import { CashBalanceModule } from './cash-balance/cash-balance.module';
+import { OrderModule } from './order/order.module';
+import { OrderItemModule } from './order-item/order-item.module';
 import secretsConfig from './secretsConfig';
 
 const jwtConfig = secretsConfig().jwt;
@@ -36,6 +38,8 @@ const jwtConfig = secretsConfig().jwt;
     ProductPriceHistoryModule,
     StockEntriesModule,
     CashBalanceModule,
+    OrderModule,
+    OrderItemModule,
   ],
   controllers: [AppController],
   providers: [AppService],

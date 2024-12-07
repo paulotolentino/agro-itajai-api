@@ -3,7 +3,7 @@ import { CreateStockEntryDto } from './dto/create-stock-entry.dto';
 // import { UpdateStockEntryDto } from './dto/update-stock-entry.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ProductsService } from 'src/products/products.service';
-import { createdBy } from 'src/createdByUser';
+import { createdBy } from 'src/utils/createdByUser';
 
 @Injectable()
 export class StockEntriesService {

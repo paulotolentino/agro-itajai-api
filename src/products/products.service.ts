@@ -4,7 +4,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { BrandsService } from 'src/brands/brands.service';
 import { CategoriesService } from 'src/categories/categories.service';
-import { createdBy } from 'src/createdByUser';
+import { createdBy } from 'src/utils/createdByUser';
 
 @Injectable()
 export class ProductsService {
@@ -72,6 +72,22 @@ export class ProductsService {
         Orders: true,
       },
     });
+    return products;
+  }
+
+  async findAllByIds(ids: number[]) {
+    const products = await this.prisma.product.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    });
+
+    if (products.length !== ids.length) {
+      throw new NotFoundException('Some products not found');
+    }
+
     return products;
   }
 

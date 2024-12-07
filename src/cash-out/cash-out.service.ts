@@ -3,7 +3,7 @@ import { CreateCashOutDto } from './dto/create-cash-out.dto';
 import { UpdateCashOutDto } from './dto/update-cash-out.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CashBalanceService } from 'src/cash-balance/cash-balance.service';
-import { createdBy } from 'src/createdByUser';
+import { createdBy } from 'src/utils/createdByUser';
 
 @Injectable()
 export class CashOutService {
@@ -59,21 +59,46 @@ export class CashOutService {
   }
 
   async update(id: number, updateCashOutDto: UpdateCashOutDto) {
-    await this.findOne(id);
-    return await this.prismaService.cashOut.update({
-      where: { id },
-      data: {
-        amount: updateCashOutDto.amount,
-        description: updateCashOutDto.description,
-        createdById: updateCashOutDto.createdById,
-      },
+    const cashout = await this.findOne(id);
+    return await this.prismaService.$transaction(async (tx) => {
+      const cashOut = await tx.cashOut.update({
+        where: { id },
+        data: {
+          amount: updateCashOutDto.amount,
+          description: updateCashOutDto.description,
+        },
+      });
+
+      if (updateCashOutDto.amount !== cashout.amount) {
+        await tx.cashBalance.update({
+          where: { id: updateCashOutDto.cashBalanceId },
+          data: {
+            amount: {
+              increment: updateCashOutDto.amount,
+              decrement: cashout.amount,
+            },
+          },
+        });
+      }
+      return cashOut;
     });
   }
 
   async remove(id: number) {
-    await this.findOne(id);
-    return await this.prismaService.cashOut.delete({
-      where: { id },
+    const cashOut = await this.findOne(id);
+    return await this.prismaService.$transaction(async (tx) => {
+      await tx.cashBalance.update({
+        where: { id: cashOut.cashBalanceId },
+        data: {
+          amount: {
+            increment: cashOut.amount,
+          },
+        },
+      });
+
+      return await tx.cashOut.delete({
+        where: { id },
+      });
     });
   }
 }
