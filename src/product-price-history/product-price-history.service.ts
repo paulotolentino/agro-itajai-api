@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductPriceHistoryDto } from './dto/create-product-price-history.dto';
-import { UpdateProductPriceHistoryDto } from './dto/update-product-price-history.dto';
+// import { UpdateProductPriceHistoryDto } from './dto/update-product-price-history.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ProductsService } from 'src/products/products.service';
 
@@ -18,7 +18,11 @@ export class ProductPriceHistoryService {
     }
 
     return await this.prismaService.productPriceHistory.create({
-      data: createProductPriceHistoryDto,
+      data: {
+        ...createProductPriceHistoryDto,
+        oldCost: product.cost,
+        oldPrice: product.price,
+      },
     });
   }
 
@@ -48,28 +52,30 @@ export class ProductPriceHistoryService {
     return productPriceHistory;
   }
 
-  async update(
-    id: number,
-    updateProductPriceHistoryDto: UpdateProductPriceHistoryDto,
-  ) {
-    const product = await this.productService.findOne(
-      updateProductPriceHistoryDto.productId,
-    );
+  // async update(
+  //   id: number,
+  //   updateProductPriceHistoryDto: UpdateProductPriceHistoryDto,
+  // ) {
+  //   const product = await this.productService.findOne(
+  //     updateProductPriceHistoryDto.productId,
+  //   );
 
-    if (!product) {
-      throw new NotFoundException('Product not found');
-    }
-    await this.findOne(id);
-    return await this.prismaService.productPriceHistory.update({
-      where: { id },
-      data: updateProductPriceHistoryDto,
-    });
-  }
+  //   if (!product) {
+  //     throw new NotFoundException('Product not found');
+  //   }
+  //   await this.findOne(id);
+  //   return await this.prismaService.productPriceHistory.update({
+  //     where: { id },
+  //     data: {
 
-  async remove(id: number) {
-    await this.findOne(id);
-    return await this.prismaService.productPriceHistory.delete({
-      where: { id },
-    });
-  }
+  //     },
+  //   });
+  // }
+
+  // async remove(id: number) {
+  //   await this.findOne(id);
+  //   return await this.prismaService.productPriceHistory.delete({
+  //     where: { id },
+  //   });
+  // }
 }

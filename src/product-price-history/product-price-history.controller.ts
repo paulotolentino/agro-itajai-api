@@ -3,15 +3,15 @@ import {
   Get,
   Post,
   Body,
-  Patch,
+  // Patch,
   Param,
-  Delete,
+  // Delete,
   UseGuards,
   Req,
 } from '@nestjs/common';
 import { ProductPriceHistoryService } from './product-price-history.service';
 import { CreateProductPriceHistoryDto } from './dto/create-product-price-history.dto';
-import { UpdateProductPriceHistoryDto } from './dto/update-product-price-history.dto';
+// import { UpdateProductPriceHistoryDto } from './dto/update-product-price-history.dto';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { AuthorizedRequest } from 'src/types/global';
 
@@ -44,19 +44,19 @@ export class ProductPriceHistoryController {
     return this.productPriceHistoryService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateProductPriceHistoryDto: UpdateProductPriceHistoryDto,
-  ) {
-    return this.productPriceHistoryService.update(
-      +id,
-      updateProductPriceHistoryDto,
-    );
-  }
+  // @Patch(':id')
+  // update(
+  //   @Param('id') id: string,
+  //   @Body() updateProductPriceHistoryDto: UpdateProductPriceHistoryDto,
+  // ) {
+  //   return this.productPriceHistoryService.update(
+  //     +id,
+  //     updateProductPriceHistoryDto,
+  //   );
+  // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.productPriceHistoryService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.productPriceHistoryService.remove(+id);
+  // }
 }
