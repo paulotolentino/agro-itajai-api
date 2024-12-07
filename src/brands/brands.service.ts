@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { createdBy } from 'src/createdByUser';
 
 @Injectable()
 export class BrandsService {
@@ -17,7 +18,7 @@ export class BrandsService {
 
   async findAll() {
     const brands = await this.prismaService.brand.findMany({
-      include: { Products: true, CreatedBy: true },
+      include: { Products: true, CreatedBy: createdBy },
     });
     return brands;
   }
@@ -25,7 +26,7 @@ export class BrandsService {
   async findOne(id: number) {
     const brand = await this.prismaService.brand.findUnique({
       where: { id },
-      include: { Products: true, CreatedBy: true },
+      include: { Products: true, CreatedBy: createdBy },
     });
 
     if (!brand) {

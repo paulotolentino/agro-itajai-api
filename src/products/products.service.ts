@@ -4,6 +4,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { BrandsService } from 'src/brands/brands.service';
 import { CategoriesService } from 'src/categories/categories.service';
+import { createdBy } from 'src/createdByUser';
 
 @Injectable()
 export class ProductsService {
@@ -63,7 +64,7 @@ export class ProductsService {
   async findAll() {
     const products = await this.prisma.product.findMany({
       include: {
-        CreatedBy: true,
+        CreatedBy: createdBy,
         Brand: true,
         Category: true,
         PriceHistory: true,
@@ -78,7 +79,7 @@ export class ProductsService {
     const product = await this.prisma.product.findUnique({
       where: { id },
       include: {
-        CreatedBy: true,
+        CreatedBy: createdBy,
         Brand: true,
         Category: true,
         PriceHistory: true,

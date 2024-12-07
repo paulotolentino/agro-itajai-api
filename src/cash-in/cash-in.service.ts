@@ -1,22 +1,47 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCashInDto } from './dto/create-cash-in.dto';
 import { UpdateCashInDto } from './dto/update-cash-in.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { CashBalanceService } from 'src/cash-balance/cash-balance.service';
+import { createdBy } from 'src/createdByUser';
 
 @Injectable()
 export class CashInService {
+  cashBalanceService: CashBalanceService = new CashBalanceService(
+    this.prismaService,
+  );
   constructor(private prismaService: PrismaService) {}
   async create(createCashInDto: CreateCashInDto) {
-    const brand = await this.prismaService.cashIn.create({
-      data: createCashInDto,
-    });
+    const cashBalance = await this.cashBalanceService.findOne(
+      createCashInDto.cashBalanceId,
+    );
 
-    return brand;
+    return await this.prismaService.$transaction(async (tx) => {
+      const cashIn = await tx.cashIn.create({
+        data: {
+          amount: createCashInDto.amount,
+          description: createCashInDto.description,
+          createdById: createCashInDto.createdById,
+          cashBalanceId: cashBalance.id,
+        },
+      });
+
+      await tx.cashBalance.update({
+        where: { id: cashBalance.id },
+        data: {
+          amount: {
+            increment: createCashInDto.amount,
+          },
+        },
+      });
+
+      return cashIn;
+    });
   }
 
   async findAll() {
     const brands = await this.prismaService.cashIn.findMany({
-      include: { CreatedBy: true },
+      include: { CreatedBy: createdBy, CashBalance: true },
     });
     return brands;
   }
@@ -24,8 +49,12 @@ export class CashInService {
   async findOne(id: number) {
     const brand = await this.prismaService.cashIn.findUnique({
       where: { id },
-      include: { CreatedBy: true },
+      include: { CreatedBy: createdBy, CashBalance: true },
     });
+
+    if (!brand) {
+      throw new NotFoundException('CashIn not found');
+    }
 
     return brand;
   }
@@ -34,7 +63,11 @@ export class CashInService {
     await this.findOne(id);
     return await this.prismaService.cashIn.update({
       where: { id },
-      data: updateCashInDto,
+      data: {
+        amount: updateCashInDto.amount,
+        description: updateCashInDto.description,
+        createdById: updateCashInDto.createdById,
+      },
     });
   }
 

@@ -3,6 +3,7 @@ import { CreateStockEntryDto } from './dto/create-stock-entry.dto';
 // import { UpdateStockEntryDto } from './dto/update-stock-entry.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ProductsService } from 'src/products/products.service';
+import { createdBy } from 'src/createdByUser';
 
 @Injectable()
 export class StockEntriesService {
@@ -79,14 +80,14 @@ export class StockEntriesService {
 
   async findAll() {
     return await this.prismaService.stockEntry.findMany({
-      include: { Product: true, CreatedBy: true },
+      include: { Product: true, CreatedBy: createdBy },
     });
   }
 
   async findOne(id: number) {
     const stockEntry = await this.prismaService.stockEntry.findUnique({
       where: { id },
-      include: { Product: true, CreatedBy: true },
+      include: { Product: true, CreatedBy: createdBy },
     });
 
     if (!stockEntry) {
