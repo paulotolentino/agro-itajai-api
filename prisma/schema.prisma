@@ -89,6 +89,8 @@ model Product {
   name         String
   description  String?
   price        Float // Preço de venda
+  averagePrice Float // Preço médio de venda
+  cost         Float // Custo de compra
   averageCost  Float // Custo médio ponderado
   Brand        Brand?                @relation(fields: [brandId], references: [id])
   brandId      Int?
@@ -213,6 +215,7 @@ model StockEntry {
   CreatedBy   User     @relation("CreatedBy", fields: [createdById], references: [id])
   createdById Int
   quantity    Int // Quantidade de produtos adicionados
+  unitPrice   Float // Preço unitário de venda
   unitCost    Float // Preço unitário de compra
   totalCost   Float // Preço total da entrada (calculado)
   createdAt   DateTime @default(now())
@@ -223,6 +226,8 @@ model ProductPriceHistory {
   id          Int      @id @default(autoincrement())
   oldPrice    Float
   newPrice    Float
+  oldCost     Float
+  newCost     Float
   Product     Product  @relation(fields: [productId], references: [id])
   productId   Int
   CreatedBy   User?    @relation("CreatedBy", fields: [createdById], references: [id])
