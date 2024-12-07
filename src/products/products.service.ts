@@ -5,6 +5,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { BrandsService } from 'src/brands/brands.service';
 import { CategoriesService } from 'src/categories/categories.service';
 import { createdBy } from 'src/utils/createdByUser';
+import { roundToTwo } from 'src/utils/money';
 
 @Injectable()
 export class ProductsService {
@@ -51,7 +52,7 @@ export class ProductsService {
           productId: product.id,
           quantity: createProductDto.stock,
           createdById: createProductDto.createdById,
-          totalCost: createProductDto.cost * createProductDto.stock,
+          totalCost: roundToTwo(createProductDto.cost * createProductDto.stock),
           unitCost: createProductDto.cost,
           unitPrice: createProductDto.price,
         },

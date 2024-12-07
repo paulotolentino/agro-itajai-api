@@ -17,7 +17,7 @@ export class CashOutService {
     );
 
     return await this.prismaService.$transaction(async (tx) => {
-      const cashIn = await tx.cashIn.create({
+      const cashOut = await tx.cashOut.create({
         data: {
           amount: createCashOutDto.amount,
           description: createCashOutDto.description,
@@ -35,7 +35,7 @@ export class CashOutService {
         },
       });
 
-      return cashIn;
+      return cashOut;
     });
   }
 
@@ -74,8 +74,8 @@ export class CashOutService {
           where: { id: updateCashOutDto.cashBalanceId },
           data: {
             amount: {
-              increment: updateCashOutDto.amount,
-              decrement: cashout.amount,
+              decrement: updateCashOutDto.amount,
+              increment: cashout.amount,
             },
           },
         });

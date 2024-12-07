@@ -37,14 +37,14 @@ export class OrderController {
     return this.orderService.findAll();
   }
 
-  @Get('date/:date')
-  findAllByDate(@Param('date') date: string) {
-    return this.orderService.findAllByDate(date);
-  }
-
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.orderService.findOne(+id);
+  }
+
+  @Get('date/:date')
+  findAllByDate(@Param('date') date: string) {
+    return this.orderService.findAllByDate(date);
   }
 
   @Patch(':id')

@@ -4,13 +4,12 @@ import { CreateStockEntryDto } from './dto/create-stock-entry.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ProductsService } from 'src/products/products.service';
 import { createdBy } from 'src/utils/createdByUser';
+import { roundToTwo } from 'src/utils/money';
 
 @Injectable()
 export class StockEntriesService {
   productsService: ProductsService = new ProductsService(this.prismaService);
   constructor(private prismaService: PrismaService) {}
-
-  roundToTwo = (num: number) => Math.round(num * 100) / 100;
 
   async create(createStockEntryDto: CreateStockEntryDto) {
     try {
@@ -42,17 +41,18 @@ export class StockEntriesService {
             unitCost: createStockEntryDto.unitCost,
             createdById: createStockEntryDto.createdById,
             unitPrice: createStockEntryDto.unitPrice,
-            totalCost:
+            totalCost: roundToTwo(
               createStockEntryDto.quantity * createStockEntryDto.unitCost,
+            ),
           },
         });
         const newQuantity = product.stock + createStockEntryDto.quantity;
-        const averageCost = this.roundToTwo(
+        const averageCost = roundToTwo(
           (product.stock * product.averageCost +
             createStockEntryDto.quantity * createStockEntryDto.unitCost) /
             newQuantity,
         );
-        const averagePrice = this.roundToTwo(
+        const averagePrice = roundToTwo(
           (product.stock * product.averagePrice +
             createStockEntryDto.quantity * createStockEntryDto.unitPrice) /
             newQuantity,
