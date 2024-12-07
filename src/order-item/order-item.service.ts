@@ -1,18 +1,18 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateOrderItemDto } from './dto/create-order-item.dto';
+// import { CreateOrderItemDto } from './dto/create-order-item.dto';
 import { UpdateOrderItemDto } from './dto/update-order-item.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class OrderItemService {
   constructor(private prismaService: PrismaService) {}
-  create(createOrderItemDto: CreateOrderItemDto) {
-    return 'This action adds a new orderItem';
-  }
+  // create(createOrderItemDto: CreateOrderItemDto) {
+  //   return 'This action adds a new orderItem';
+  // }
 
-  findAll() {
-    return `This action returns all orderItem`;
-  }
+  // findAll() {
+  //   return `This action returns all orderItem`;
+  // }
 
   async findOne(id: number) {
     const orderItem = await this.prismaService.orderItem.findUnique({

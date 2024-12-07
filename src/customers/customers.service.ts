@@ -3,6 +3,7 @@ import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { createdBy } from 'src/utils/createdByUser';
+import { roundToTwo } from 'src/utils/money';
 
 @Injectable()
 export class CustomersService {
@@ -33,16 +34,17 @@ export class CustomersService {
       const debitsPaid = customer.DebitPayment.filter(
         (payment) => !payment.arquivedDate,
       );
-      const totalDebitPaid = debitsPaid.reduce(
-        (acc, payment) => acc + payment.amount,
-        0,
+      const totalDebitPaid = roundToTwo(
+        debitsPaid.reduce((acc, payment) => acc + payment.amount, 0),
       );
       const debits = customer.Orders.filter(
         (order) =>
           (order.statusId === 2 || order.statusId === 4) &&
           order.paymentTypeId === 5,
       );
-      const totalDebit = debits.reduce((acc, order) => acc + order.total, 0);
+      const totalDebit = roundToTwo(
+        debits.reduce((acc, order) => acc + order.total, 0),
+      );
 
       return {
         ...customer,

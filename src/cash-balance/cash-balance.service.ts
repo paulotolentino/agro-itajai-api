@@ -7,24 +7,25 @@ import { CreateCashBalanceDto } from './dto/create-cash-balance.dto';
 import { UpdateCashBalanceDto } from './dto/update-cash-balance.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { createdBy } from 'src/utils/createdByUser';
+import { formatDate } from 'src/utils/date';
 
 @Injectable()
 export class CashBalanceService {
   constructor(private prismaService: PrismaService) {}
   async create(createCashBalanceDto: CreateCashBalanceDto) {
-    // Find if there is a cash balance for the date
-    const cashBalance = await this.findByDate(createCashBalanceDto.date);
+    // Find if there is a cash balance for the date or if there is an open cash balance
+    await Promise.all([
+      this.verifyDateAvailability(createCashBalanceDto.date),
+      this.verifyCashBalanceOpenAvailability(),
+    ]);
 
-    // If there is a cash balance for the date, throw an error
-    if (cashBalance) {
-      throw new ConflictException('CashBalance already exists');
-    }
+    const date = formatDate(createCashBalanceDto.date);
 
     // If there is no cash balance for the date, create a new one
     return await this.prismaService.cashBalance.create({
       data: {
         amount: 0,
-        date: createCashBalanceDto.date,
+        date,
         createdById: createCashBalanceDto.createdById,
         closed: false,
       },
@@ -33,7 +34,12 @@ export class CashBalanceService {
 
   async findAll() {
     const cashBalances = await this.prismaService.cashBalance.findMany({
-      include: { CreatedBy: createdBy, CashIns: true, CashOuts: true },
+      include: {
+        CreatedBy: createdBy,
+        CashIns: true,
+        CashOuts: true,
+        Orders: true,
+      },
     });
     return cashBalances;
   }
@@ -41,7 +47,12 @@ export class CashBalanceService {
   async findOne(id: number) {
     const cashBalance = await this.prismaService.cashBalance.findUnique({
       where: { id },
-      include: { CreatedBy: createdBy, CashIns: true, CashOuts: true },
+      include: {
+        CreatedBy: createdBy,
+        CashIns: true,
+        CashOuts: true,
+        Orders: true,
+      },
     });
 
     if (!cashBalance) {
@@ -49,6 +60,16 @@ export class CashBalanceService {
     }
 
     return cashBalance;
+  }
+
+  async verifyCashBalanceOpenAvailability() {
+    const cashBalance = await this.prismaService.cashBalance.findFirst({
+      where: { closed: false },
+    });
+
+    if (cashBalance) {
+      throw new ConflictException('CashBalance already open');
+    }
   }
 
   async findByDate(dateToSearchFor: Date) {

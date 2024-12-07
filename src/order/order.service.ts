@@ -9,6 +9,9 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CustomersService } from 'src/customers/customers.service';
 import { ProductsService } from 'src/products/products.service';
 import { CashBalanceService } from 'src/cash-balance/cash-balance.service';
+import { formatDate } from 'src/utils/date';
+import { createdBy } from 'src/utils/createdByUser';
+import { roundToTwo } from 'src/utils/money';
 
 @Injectable()
 export class OrderService {
@@ -19,12 +22,13 @@ export class OrderService {
   );
   constructor(private prismaService: PrismaService) {}
   async create(createOrderDto: CreateOrderDto) {
+    const date = formatDate(createOrderDto.date);
     const [customer, items, cashBalance] = await Promise.all([
       this.customersService.findOne(createOrderDto.customerId),
       this.procutsService.findAllByIds(
         createOrderDto.orderItems.map((orderItem) => orderItem.productId),
       ),
-      this.cashBalanceService.findByDate(createOrderDto.date),
+      this.cashBalanceService.findByDate(date),
     ]);
     if (cashBalance.closed) {
       throw new ConflictException('Cash balance is closed');
@@ -35,16 +39,18 @@ export class OrderService {
           createdById: createOrderDto.createdById,
           discount: createOrderDto.discount,
           paymentTypeId: createOrderDto.paymentTypeId,
-          statusId: createOrderDto.statusId,
-          date: createOrderDto.date,
+          statusId: createOrderDto.paymentTypeId === 5 ? 2 : 1, // Caso seja Fiado, o status é Em aberto, senão é Pago
+          date,
           cashBalanceId: cashBalance.id,
           customerId: customer.id,
-          total: items.reduce((acc, item) => {
-            const orderItem = createOrderDto.orderItems.find(
-              (orderItem) => orderItem.productId === item.id,
-            );
-            return acc + orderItem.quantity * item.price;
-          }, 0),
+          total: roundToTwo(
+            items.reduce((acc, item) => {
+              const orderItem = createOrderDto.orderItems.find(
+                (orderItem) => orderItem.productId === item.id,
+              );
+              return acc + orderItem.quantity * item.price;
+            }, 0),
+          ),
         },
       });
 
@@ -92,7 +98,7 @@ export class OrderService {
   async findAll() {
     return await this.prismaService.order.findMany({
       include: {
-        CreatedBy: true,
+        CreatedBy: createdBy,
         Customer: true,
         Items: true,
         CashBalance: true,
@@ -109,7 +115,7 @@ export class OrderService {
         date,
       },
       include: {
-        CreatedBy: true,
+        CreatedBy: createdBy,
         Customer: true,
         Items: true,
         CashBalance: true,
@@ -123,7 +129,7 @@ export class OrderService {
     const order = await this.prismaService.order.findUnique({
       where: { id },
       include: {
-        CreatedBy: true,
+        CreatedBy: createdBy,
         Customer: true,
         Items: true,
         CashBalance: true,

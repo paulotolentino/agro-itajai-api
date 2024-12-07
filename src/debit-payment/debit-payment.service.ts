@@ -4,6 +4,8 @@ import { CreateDebitPaymentDto } from './dto/create-debit-payment.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CustomersService } from 'src/customers/customers.service';
 import { CashBalanceService } from 'src/cash-balance/cash-balance.service';
+import { formatDate } from 'src/utils/date';
+import { createdBy } from 'src/utils/createdByUser';
 
 @Injectable()
 export class DebitPaymentService {
@@ -85,7 +87,7 @@ export class DebitPaymentService {
   async findAll() {
     return await this.prismaService.debitPayment.findMany({
       include: {
-        CreatedBy: true,
+        CreatedBy: createdBy,
         Customer: true,
       },
     });
@@ -97,7 +99,7 @@ export class DebitPaymentService {
         id,
       },
       include: {
-        CreatedBy: true,
+        CreatedBy: createdBy,
         Customer: true,
       },
     });

@@ -1,4 +1,4 @@
-const formatDate = (date: Date | string): Date => {
+export const formatDate = (date: Date | string): Date => {
   // create a cashBalance using prisma
   const formatedDate = new Date(date);
   // Add 3 hours to the date to match the timezone, in case it changes the date
