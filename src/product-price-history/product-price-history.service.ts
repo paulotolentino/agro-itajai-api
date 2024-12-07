@@ -3,7 +3,7 @@ import { CreateProductPriceHistoryDto } from './dto/create-product-price-history
 // import { UpdateProductPriceHistoryDto } from './dto/update-product-price-history.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ProductsService } from 'src/products/products.service';
-import { createdBy } from 'src/createdByUser';
+import { createdBy } from 'src/utils/createdByUser';
 
 @Injectable()
 export class ProductPriceHistoryService {

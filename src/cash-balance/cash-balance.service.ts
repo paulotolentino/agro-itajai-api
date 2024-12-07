@@ -1,16 +1,27 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateCashBalanceDto } from './dto/create-cash-balance.dto';
 import { UpdateCashBalanceDto } from './dto/update-cash-balance.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { createdBy } from 'src/createdByUser';
+import { createdBy } from 'src/utils/createdByUser';
 
 @Injectable()
 export class CashBalanceService {
   constructor(private prismaService: PrismaService) {}
   async create(createCashBalanceDto: CreateCashBalanceDto) {
-    // create a cashBalance using prisma
-    new Date(createCashBalanceDto.date);
-    const cashBalance = await this.prismaService.cashBalance.create({
+    // Find if there is a cash balance for the date
+    const cashBalance = await this.findByDate(createCashBalanceDto.date);
+
+    // If there is a cash balance for the date, throw an error
+    if (cashBalance) {
+      throw new ConflictException('CashBalance already exists');
+    }
+
+    // If there is no cash balance for the date, create a new one
+    return await this.prismaService.cashBalance.create({
       data: {
         amount: 0,
         date: createCashBalanceDto.date,
@@ -18,8 +29,6 @@ export class CashBalanceService {
         closed: false,
       },
     });
-
-    return cashBalance;
   }
 
   async findAll() {
@@ -40,6 +49,31 @@ export class CashBalanceService {
     }
 
     return cashBalance;
+  }
+
+  async findByDate(dateToSearchFor: Date) {
+    const date = formatDate(dateToSearchFor);
+    const cashBalance = await this.prismaService.cashBalance.findFirst({
+      where: { date },
+      include: { CreatedBy: createdBy, CashIns: true, CashOuts: true },
+    });
+
+    if (!cashBalance) {
+      throw new NotFoundException('CashBalance not found');
+    }
+
+    return cashBalance;
+  }
+
+  async verifyDateAvailability(dateToSearchFor: Date) {
+    const date = formatDate(dateToSearchFor);
+    const cashBalance = await this.prismaService.cashBalance.findFirst({
+      where: { date },
+    });
+
+    if (cashBalance) {
+      throw new ConflictException('CashBalance already exists');
+    }
   }
 
   async update(id: number, updateCashBalanceDto: UpdateCashBalanceDto) {
