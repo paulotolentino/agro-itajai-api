@@ -13,6 +13,7 @@ import { ProductsModule } from './products/products.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ProductPriceHistoryModule } from './product-price-history/product-price-history.module';
 import { StockEntriesModule } from './stock-entries/stock-entries.module';
+import { CashBalanceModule } from './cash-balance/cash-balance.module';
 import secretsConfig from './secretsConfig';
 
 const jwtConfig = secretsConfig().jwt;
@@ -34,6 +35,7 @@ const jwtConfig = secretsConfig().jwt;
     CategoriesModule,
     ProductPriceHistoryModule,
     StockEntriesModule,
+    CashBalanceModule,
   ],
   controllers: [AppController],
   providers: [AppService],

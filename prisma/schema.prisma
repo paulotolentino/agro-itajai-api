@@ -30,6 +30,7 @@ model User {
   CreatedStockEntries          StockEntry[]          @relation("CreatedBy")
   CreatedProductPriceHistories ProductPriceHistory[] @relation("CreatedBy")
   CreatedCategories            Category[]            @relation("CreatedBy")
+  CreatedCashBalances          CashBalance[]         @relation("CreatedBy")
   Status                       UserStatus?           @relation(fields: [statusId], references: [id])
   statusId                     Int?
   active                       Boolean               @default(true)
@@ -189,23 +190,27 @@ model Refund {
 }
 
 model CashOut {
-  id          Int      @id @default(autoincrement())
-  CreatedBy   User     @relation("CreatedBy", fields: [createdById], references: [id])
-  createdById Int
-  description String?
-  amount      Float
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            Int         @id @default(autoincrement())
+  CreatedBy     User        @relation("CreatedBy", fields: [createdById], references: [id])
+  createdById   Int
+  description   String?
+  amount        Float
+  CashBalance   CashBalance @relation(fields: [cashBalanceId], references: [id])
+  cashBalanceId Int
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 }
 
 model CashIn {
-  id          Int      @id @default(autoincrement())
-  CreatedBy   User     @relation("CreatedBy", fields: [createdById], references: [id])
-  createdById Int
-  description String?
-  amount      Float
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            Int         @id @default(autoincrement())
+  CreatedBy     User        @relation("CreatedBy", fields: [createdById], references: [id])
+  createdById   Int
+  description   String?
+  amount        Float
+  CashBalance   CashBalance @relation(fields: [cashBalanceId], references: [id])
+  cashBalanceId Int
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 }
 
 model StockEntry {
@@ -234,4 +239,17 @@ model ProductPriceHistory {
   createdById Int?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model CashBalance {
+  id          Int       @id @default(autoincrement())
+  amount      Float
+  CreatedBy   User      @relation("CreatedBy", fields: [createdById], references: [id])
+  createdById Int
+  CashIns     CashIn[]
+  CashOuts    CashOut[]
+  date        DateTime  @default(now())
+  closed      Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }

@@ -3,6 +3,7 @@ import { CreateProductPriceHistoryDto } from './dto/create-product-price-history
 // import { UpdateProductPriceHistoryDto } from './dto/update-product-price-history.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ProductsService } from 'src/products/products.service';
+import { createdBy } from 'src/createdByUser';
 
 @Injectable()
 export class ProductPriceHistoryService {
@@ -30,7 +31,7 @@ export class ProductPriceHistoryService {
     return await this.prismaService.productPriceHistory.findMany({
       include: {
         Product: true,
-        CreatedBy: true,
+        CreatedBy: createdBy,
       },
     });
   }
@@ -41,7 +42,7 @@ export class ProductPriceHistoryService {
         where: { id },
         include: {
           Product: true,
-          CreatedBy: true,
+          CreatedBy: createdBy,
         },
       });
 

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { createdBy } from 'src/createdByUser';
 
 @Injectable()
 export class CustomersService {
@@ -21,7 +22,7 @@ export class CustomersService {
   async findAll() {
     return await this.prismaService.customer.findMany({
       include: {
-        CreatedBy: true,
+        CreatedBy: createdBy,
         DebitPayment: true,
         Orders: true,
         Status: true,
@@ -35,7 +36,7 @@ export class CustomersService {
         id,
       },
       include: {
-        CreatedBy: true,
+        CreatedBy: createdBy,
         DebitPayment: true,
         Orders: true,
         Status: true,
