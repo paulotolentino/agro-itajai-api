@@ -171,14 +171,15 @@ model PaymentType {
 }
 
 model DebitPayment {
-  id          Int      @id @default(autoincrement())
-  Customer    Customer @relation(fields: [customerId], references: [id])
-  customerId  Int
-  amount      Float
-  CreatedBy   User     @relation("CreatedBy", fields: [createdById], references: [id])
-  createdById Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           Int       @id @default(autoincrement())
+  Customer     Customer  @relation(fields: [customerId], references: [id])
+  customerId   Int
+  amount       Float
+  arquivedDate DateTime?
+  CreatedBy    User      @relation("CreatedBy", fields: [createdById], references: [id])
+  createdById  Int
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }
 
 model CashOut {

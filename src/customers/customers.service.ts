@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -20,7 +20,7 @@ export class CustomersService {
   }
 
   async findAll() {
-    return await this.prismaService.customer.findMany({
+    const customers = await this.prismaService.customer.findMany({
       include: {
         CreatedBy: createdBy,
         DebitPayment: true,
@@ -28,10 +28,34 @@ export class CustomersService {
         Status: true,
       },
     });
+
+    return customers.map((customer) => {
+      const debitsPaid = customer.DebitPayment.filter(
+        (payment) => !payment.arquivedDate,
+      );
+      const totalDebitPaid = debitsPaid.reduce(
+        (acc, payment) => acc + payment.amount,
+        0,
+      );
+      const debits = customer.Orders.filter(
+        (order) =>
+          (order.statusId === 2 || order.statusId === 4) &&
+          order.paymentTypeId === 5,
+      );
+      const totalDebit = debits.reduce((acc, order) => acc + order.total, 0);
+
+      return {
+        ...customer,
+        debits,
+        totalDebit,
+        debitsPaid,
+        totalDebitPaid,
+      };
+    });
   }
 
   async findOne(id: number) {
-    return await this.prismaService.customer.findUnique({
+    const customer = await this.prismaService.customer.findUnique({
       where: {
         id,
       },
@@ -42,6 +66,31 @@ export class CustomersService {
         Status: true,
       },
     });
+
+    if (!customer) {
+      throw new NotFoundException('Customer not found');
+    }
+    const debitsPaid = customer.DebitPayment.filter(
+      (payment) => !payment.arquivedDate,
+    );
+    const totalDebitPaid = debitsPaid.reduce(
+      (acc, payment) => acc + payment.amount,
+      0,
+    );
+    const debits = customer.Orders.filter(
+      (order) =>
+        (order.statusId === 2 || order.statusId === 4) &&
+        order.paymentTypeId === 5,
+    );
+    const totalDebit = debits.reduce((acc, order) => acc + order.total, 0);
+
+    return {
+      ...customer,
+      debits,
+      totalDebit,
+      debitsPaid,
+      totalDebitPaid,
+    };
   }
 
   async update(id: number, updateCustomerDto: UpdateCustomerDto) {
