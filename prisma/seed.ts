@@ -113,12 +113,14 @@ async function main() {
   });
   await prisma.orderStatus.upsert({
     create: {
-      id: 3,
+      id: 4,
       name: 'Atrasado',
     },
-    update: {},
+    update: {
+      name: 'Atrasado',
+    },
     where: {
-      id: 3,
+      id: 4,
     },
   });
 

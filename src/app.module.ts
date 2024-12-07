@@ -16,6 +16,7 @@ import { StockEntriesModule } from './stock-entries/stock-entries.module';
 import { CashBalanceModule } from './cash-balance/cash-balance.module';
 import { OrderModule } from './order/order.module';
 import { OrderItemModule } from './order-item/order-item.module';
+import { DebitPaymentModule } from './debit-payment/debit-payment.module';
 import secretsConfig from './secretsConfig';
 
 const jwtConfig = secretsConfig().jwt;
@@ -40,6 +41,7 @@ const jwtConfig = secretsConfig().jwt;
     CashBalanceModule,
     OrderModule,
     OrderItemModule,
+    DebitPaymentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
