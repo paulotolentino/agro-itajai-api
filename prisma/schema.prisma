@@ -1,0 +1,258 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "darwin-arm64"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                           Int                   @id @default(autoincrement())
+  username                     String                @unique
+  name                         String
+  password                     String
+  CreatedCustomers             Customer[]            @relation("CreatedBy")
+  CreatedBrands                Brand[]               @relation("CreatedBy")
+  CreatedProducts              Product[]             @relation("CreatedBy")
+  CreatedOrders                Order[]               @relation("CreatedBy")
+  CreatedDebitPayment          DebitPayment[]        @relation("CreatedBy")
+  CreatedCashIns               CashIn[]              @relation("CreatedBy")
+  CreatedCashOuts              CashOut[]             @relation("CreatedBy")
+  CreatedStockEntries          StockEntry[]          @relation("CreatedBy")
+  CreatedProductPriceHistories ProductPriceHistory[] @relation("CreatedBy")
+  CreatedCategories            Category[]            @relation("CreatedBy")
+  CreatedCashBalances          CashBalance[]         @relation("CreatedBy")
+  UpdatedSettings              Settings?
+  Status                       UserStatus?           @relation(fields: [statusId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  statusId                     Int?
+  active                       Boolean               @default(true)
+  createdAt                    DateTime              @default(now())
+  updatedAt                    DateTime              @updatedAt
+}
+
+model UserStatus {
+  id        Int      @id @default(autoincrement())
+  name      String
+  Users     User[]
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Customer {
+  id           Int            @id @default(autoincrement())
+  name         String
+  nickname     String?
+  cpf          String?
+  phone        String?
+  observation  String?
+  DebitPayment DebitPayment[]
+  Orders       Order[]
+  CreatedBy    User?          @relation("CreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  createdById  Int?
+  Status       CustomerStatus @relation(fields: [statusId], references: [id])
+  statusId     Int
+  active       Boolean        @default(true)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model CustomerStatus {
+  id        Int        @id @default(autoincrement())
+  name      String
+  Customers Customer[]
+  active    Boolean    @default(true)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Brand {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  Products    Product[]
+  active      Boolean   @default(true)
+  CreatedBy   User?     @relation("CreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  createdById Int?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Product {
+  id           Int                   @id @default(autoincrement())
+  name         String
+  description  String?
+  price        Float // Preço de venda
+  averagePrice Float // Preço médio de venda
+  cost         Float // Custo de compra
+  averageCost  Float // Custo médio ponderado
+  Brand        Brand?                @relation(fields: [brandId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  brandId      Int?
+  stock        Float                 @default(0) // Estoque total disponível
+  Orders       OrderItem[]
+  StockEntries StockEntry[] // Relacionamento com entradas de estoque
+  PriceHistory ProductPriceHistory[]
+  active       Boolean               @default(true)
+  CreatedBy    User?                 @relation("CreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  createdById  Int?
+  Category     Category?             @relation(fields: [categoryId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  categoryId   Int?
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+}
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  Products    Product[]
+  active      Boolean   @default(true)
+  CreatedBy   User?     @relation("CreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  createdById Int?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Order {
+  id            Int          @id @default(autoincrement())
+  total         Float
+  Items         OrderItem[]
+  CashBalance   CashBalance  @relation(fields: [cashBalanceId], references: [id])
+  cashBalanceId Int
+  Status        OrderStatus? @relation(fields: [statusId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  statusId      Int?
+  discount      Float
+  PaymentType   PaymentType? @relation(fields: [paymentTypeId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  paymentTypeId Int?
+  Customer      Customer?    @relation(fields: [customerId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  customerId    Int?
+  date          DateTime
+  CreatedBy     User?        @relation("CreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  createdById   Int?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+model OrderStatus {
+  id        Int      @id @default(autoincrement())
+  name      String
+  Orders    Order[]
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  Order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  orderId   Int
+  unitPrice Float
+  Product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  productId Int?
+  quantity  Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PaymentType {
+  id        Int      @id @default(autoincrement())
+  name      String
+  Orders    Order[]
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DebitPayment {
+  id           Int       @id @default(autoincrement())
+  Customer     Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  customerId   Int
+  amount       Float
+  arquivedDate DateTime?
+  CreatedBy    User?     @relation("CreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  createdById  Int?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model CashOut {
+  id            Int         @id @default(autoincrement())
+  CreatedBy     User?       @relation("CreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  createdById   Int?
+  description   String?
+  amount        Float
+  CashBalance   CashBalance @relation(fields: [cashBalanceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  cashBalanceId Int
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model CashIn {
+  id            Int         @id @default(autoincrement())
+  CreatedBy     User?       @relation("CreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  createdById   Int?
+  description   String?
+  amount        Float
+  CashBalance   CashBalance @relation(fields: [cashBalanceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  cashBalanceId Int
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model StockEntry {
+  id          Int      @id @default(autoincrement())
+  Product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  productId   Int
+  CreatedBy   User?    @relation("CreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  createdById Int?
+  quantity    Float // Quantidade de produtos adicionados
+  unitPrice   Float // Preço unitário de venda
+  unitCost    Float // Preço unitário de compra
+  totalCost   Float // Preço total da entrada (calculado)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ProductPriceHistory {
+  id          Int      @id @default(autoincrement())
+  oldPrice    Float
+  newPrice    Float
+  oldCost     Float
+  newCost     Float
+  Product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  productId   Int
+  CreatedBy   User?    @relation("CreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  createdById Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model CashBalance {
+  id          Int       @id @default(autoincrement())
+  amount      Float
+  Orders      Order[]
+  CreatedBy   User?     @relation("CreatedBy", fields: [createdById], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  createdById Int?
+  CashIns     CashIn[]
+  CashOuts    CashOut[]
+  date        DateTime  @default(now())
+  closed      Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Settings {
+  id                Int      @id @default(autoincrement())
+  daysToExpireDebit Int
+  UpdatedBy         User?    @relation(fields: [updatedById], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  updatedById       Int?     @unique
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
