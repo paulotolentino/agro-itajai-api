@@ -36,6 +36,16 @@ export class ProductPriceHistoryService {
     });
   }
 
+  async findAllByProductId(id: number) {
+    return await this.prismaService.productPriceHistory.findMany({
+      include: {
+        Product: true,
+        CreatedBy: createdBy,
+      },
+      where: { productId: id },
+    });
+  }
+
   async findOne(id: number) {
     const productPriceHistory =
       await this.prismaService.productPriceHistory.findUnique({

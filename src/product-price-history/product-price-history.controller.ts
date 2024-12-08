@@ -14,7 +14,10 @@ import { CreateProductPriceHistoryDto } from './dto/create-product-price-history
 // import { UpdateProductPriceHistoryDto } from './dto/update-product-price-history.dto';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { AuthorizedRequest } from 'src/types/global';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
+@ApiTags('product-price-history')
 @Controller('product-price-history')
 @UseGuards(AuthGuard) // Aplica o guard em todas as rotas deste controlador
 export class ProductPriceHistoryController {
@@ -22,6 +25,9 @@ export class ProductPriceHistoryController {
     private readonly productPriceHistoryService: ProductPriceHistoryService,
   ) {}
 
+  @ApiOperation({
+    summary: 'Cria um registro no histórico de preço de um produto',
+  })
   @Post()
   create(
     @Body() createProductPriceHistoryDto: CreateProductPriceHistoryDto,
@@ -34,11 +40,26 @@ export class ProductPriceHistoryController {
     });
   }
 
+  @ApiOperation({
+    summary:
+      'Busca todos os registro no histórico de preço de todos os produtos',
+  })
   @Get()
   findAll() {
     return this.productPriceHistoryService.findAll();
   }
 
+  @ApiOperation({
+    summary: 'Busca todos os registro no histórico de preço de um produto',
+  })
+  @Get('product/:id')
+  findAllByProductId(@Param('id') id: string) {
+    return this.productPriceHistoryService.findAllByProductId(+id);
+  }
+
+  @ApiOperation({
+    summary: 'Busca um registro no histórico de preço de um produto pelo ID',
+  })
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.productPriceHistoryService.findOne(+id);

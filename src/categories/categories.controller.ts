@@ -14,12 +14,16 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { AuthGuard } from 'src/common/guards/auth.guard';
 import { AuthorizedRequest } from 'src/types/global';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
+@ApiTags('categories')
 @Controller('categories')
 @UseGuards(AuthGuard) // Aplica o guard em todas as rotas deste controlador
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
+  @ApiOperation({ summary: 'Cria uma nova categoria' })
   @Post()
   create(
     @Body() createCategoryDto: CreateCategoryDto,
@@ -32,16 +36,19 @@ export class CategoriesController {
     });
   }
 
+  @ApiOperation({ summary: 'Busca todas as categorias' })
   @Get()
   findAll() {
     return this.categoriesService.findAll();
   }
 
+  @ApiOperation({ summary: 'Busca uma categoria pelo ID' })
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.categoriesService.findOne(+id);
   }
 
+  @ApiOperation({ summary: 'Atualiza uma categoria pelo ID' })
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -50,6 +57,7 @@ export class CategoriesController {
     return this.categoriesService.update(+id, updateCategoryDto);
   }
 
+  @ApiOperation({ summary: 'Exclui uma categoria pelo ID' })
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.categoriesService.remove(+id);
