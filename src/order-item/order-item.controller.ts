@@ -10,7 +10,10 @@ import {
 import { OrderItemService } from './order-item.service';
 // import { CreateOrderItemDto } from './dto/create-order-item.dto';
 import { UpdateOrderItemDto } from './dto/update-order-item.dto';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
+@ApiTags('order-item')
 @Controller('order-item')
 export class OrderItemController {
   constructor(private readonly orderItemService: OrderItemService) {}
@@ -25,11 +28,13 @@ export class OrderItemController {
   //   return this.orderItemService.findAll();
   // }
 
+  @ApiOperation({ summary: 'Busca um item do carrinho pelo ID' })
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.orderItemService.findOne(+id);
   }
 
+  @ApiOperation({ summary: 'Atualiza um item do carrinho pelo ID' })
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -38,6 +43,7 @@ export class OrderItemController {
     return this.orderItemService.update(+id, updateOrderItemDto);
   }
 
+  @ApiOperation({ summary: 'Exclui um item do carrinho pelo ID' })
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.orderItemService.remove(+id);

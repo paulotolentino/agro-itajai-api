@@ -84,6 +84,13 @@ export class StockEntriesService {
     });
   }
 
+  async findAllByProductId(id: number) {
+    return await this.prismaService.stockEntry.findMany({
+      include: { Product: true, CreatedBy: createdBy },
+      where: { productId: id },
+    });
+  }
+
   async findOne(id: number) {
     const stockEntry = await this.prismaService.stockEntry.findUnique({
       where: { id },

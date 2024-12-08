@@ -1,4 +1,10 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateBrandDto } from './create-brand.dto';
+import { IsNotEmpty } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
-export class UpdateBrandDto extends PartialType(CreateBrandDto) {}
+export class UpdateBrandDto {
+  @ApiProperty({ example: 'Havana', description: 'Nome da marca' })
+  @IsNotEmpty()
+  name: string;
+
+  createdById: number;
+}
