@@ -13,6 +13,7 @@ export class UsersService {
     const result = await this.prisma.user.create({
       data: {
         ...createUserDto,
+        username: createUserDto.username.toLowerCase(),
         password: hashedPassword,
       },
     });
@@ -36,6 +37,9 @@ export class UsersService {
         CreatedStockEntries: true,
         CreatedCategories: true,
         Status: true,
+      },
+      orderBy: {
+        name: 'asc',
       },
     }); // Retorna todos os usuários
     const formattedUsers = users.map((user) => {
@@ -68,11 +72,16 @@ export class UsersService {
 
   async update(id: number, updateUserDto: UpdateUserDto) {
     await this.findOne(id);
-    const { password, ...data } = updateUserDto;
-    const { password: pass, ...user } = await this.prisma.user.update({
+
+    if (updateUserDto.password) {
+      updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
+    }
+    const result = await this.prisma.user.update({
       where: { id },
-      data,
+      data: updateUserDto,
     });
+
+    const { password, ...user } = result;
 
     return user;
   }

@@ -31,6 +31,8 @@ export class DebitPaymentService {
             amount: createDebitPaymentDto.amount,
             createdById: createDebitPaymentDto.createdById,
             arquivedDate: formatDate(new Date()),
+            paymentDate: formatDate(createDebitPaymentDto.date),
+            storeId: createDebitPaymentDto.storeId,
           },
         });
 
@@ -77,6 +79,8 @@ export class DebitPaymentService {
           customerId: customer.id,
           amount: createDebitPaymentDto.amount,
           createdById: createDebitPaymentDto.createdById,
+          paymentDate: formatDate(createDebitPaymentDto.date),
+          storeId: createDebitPaymentDto.storeId,
         },
       });
 

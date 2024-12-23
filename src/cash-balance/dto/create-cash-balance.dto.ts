@@ -1,4 +1,4 @@
-import { IsDate } from 'class-validator';
+import { IsDate, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateCashBalanceDto {
@@ -10,4 +10,11 @@ export class CreateCashBalanceDto {
   })
   @IsDate()
   date: Date;
+
+  @ApiProperty({
+    example: 2,
+    description: 'ID da unidade correspondente',
+  })
+  @IsNumber()
+  storeId: number;
 }

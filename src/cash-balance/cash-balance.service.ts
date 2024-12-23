@@ -15,8 +15,11 @@ export class CashBalanceService {
   async create(createCashBalanceDto: CreateCashBalanceDto) {
     // Find if there is a cash balance for the date or if there is an open cash balance
     await Promise.all([
-      this.verifyDateAvailability(createCashBalanceDto.date),
-      this.verifyCashBalanceOpenAvailability(),
+      this.verifyDateAvailability(
+        createCashBalanceDto.date,
+        createCashBalanceDto.storeId,
+      ),
+      this.verifyCashBalanceOpenAvailability(createCashBalanceDto.storeId),
     ]);
 
     const date = formatDate(createCashBalanceDto.date);
@@ -28,6 +31,7 @@ export class CashBalanceService {
         date,
         createdById: createCashBalanceDto.createdById,
         closed: false,
+        storeId: createCashBalanceDto.storeId,
       },
     });
   }
@@ -39,7 +43,22 @@ export class CashBalanceService {
         CashIns: true,
         CashOuts: true,
         Orders: true,
+        Store: true,
       },
+    });
+    return cashBalances;
+  }
+
+  async findAllByStoreId(id: number) {
+    const cashBalances = await this.prismaService.cashBalance.findMany({
+      include: {
+        CreatedBy: createdBy,
+        CashIns: true,
+        CashOuts: true,
+        Orders: true,
+        Store: true,
+      },
+      where: { storeId: id },
     });
     return cashBalances;
   }
@@ -52,6 +71,7 @@ export class CashBalanceService {
         CashIns: true,
         CashOuts: true,
         Orders: true,
+        Store: true,
       },
     });
 
@@ -62,9 +82,9 @@ export class CashBalanceService {
     return cashBalance;
   }
 
-  async verifyCashBalanceOpenAvailability() {
+  async verifyCashBalanceOpenAvailability(storeId: number) {
     const cashBalance = await this.prismaService.cashBalance.findFirst({
-      where: { closed: false },
+      where: { closed: false, storeId },
     });
 
     if (cashBalance) {
@@ -72,11 +92,16 @@ export class CashBalanceService {
     }
   }
 
-  async findByDate(dateToSearchFor: Date) {
+  async findByDate(dateToSearchFor: Date, storeId: number) {
     const date = formatDate(dateToSearchFor);
     const cashBalance = await this.prismaService.cashBalance.findFirst({
-      where: { date },
-      include: { CreatedBy: createdBy, CashIns: true, CashOuts: true },
+      where: { date, storeId },
+      include: {
+        CreatedBy: createdBy,
+        CashIns: true,
+        CashOuts: true,
+        Store: true,
+      },
     });
 
     if (!cashBalance) {
@@ -86,10 +111,10 @@ export class CashBalanceService {
     return cashBalance;
   }
 
-  async verifyDateAvailability(dateToSearchFor: Date) {
+  async verifyDateAvailability(dateToSearchFor: Date, storeId: number) {
     const date = formatDate(dateToSearchFor);
     const cashBalance = await this.prismaService.cashBalance.findFirst({
-      where: { date },
+      where: { date, storeId },
     });
 
     if (cashBalance) {

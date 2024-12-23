@@ -29,10 +29,11 @@ export class CashOutController {
     @Body() createCashOutDto: CreateCashOutDto,
     @Req() req: AuthorizedRequest,
   ) {
-    const user = req.user; // Pega o usuário anexado à request (via guard ou middleware)
+    const { user, storeId } = req; // Pega o usuário anexado à request (via guard ou middleware)
     return this.cashOutService.create({
       ...createCashOutDto,
       createdById: user.id,
+      storeId,
     });
   }
 
@@ -40,6 +41,13 @@ export class CashOutController {
   @Get()
   findAll() {
     return this.cashOutService.findAll();
+  }
+
+  @ApiOperation({ summary: 'Busca todas as saídas de caixa de uma unidade' })
+  @Get('store')
+  findAllByStoreId(@Req() req: AuthorizedRequest) {
+    const { storeId } = req;
+    return this.cashOutService.findAllByStoreId(storeId);
   }
 
   @ApiOperation({ summary: 'Busca uma saída de caixa pelo ID' })

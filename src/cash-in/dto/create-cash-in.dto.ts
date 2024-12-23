@@ -22,4 +22,11 @@ export class CreateCashInDto {
   })
   @IsNumber()
   cashBalanceId: number;
+
+  @ApiProperty({
+    example: 2,
+    description: 'ID da unidade correspondente',
+  })
+  @IsNumber()
+  storeId: number;
 }

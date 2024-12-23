@@ -27,4 +27,11 @@ export class CreateOrderDto {
   @ApiProperty({ example: '2021-01-01', description: 'Data do pedido' })
   @IsDate()
   date: Date;
+
+  @ApiProperty({
+    example: 2,
+    description: 'ID da unidade correspondente',
+  })
+  @IsNumber()
+  storeId: number;
 }

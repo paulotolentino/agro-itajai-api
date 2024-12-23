@@ -15,4 +15,11 @@ export class CreateDebitPaymentDto {
   @ApiProperty({ example: '2021-01-01', description: 'Data do Pagamento' })
   @IsDate()
   date: Date;
+
+  @ApiProperty({
+    example: 2,
+    description: 'ID da unidade correspondente',
+  })
+  @IsNumber()
+  storeId: number;
 }

@@ -15,4 +15,11 @@ export class CreateProductPriceHistoryDto {
   @ApiProperty({ example: 100, description: 'Novo preço de custo do produto' })
   @IsNumber()
   newCost: number;
+
+  @ApiProperty({
+    example: 2,
+    description: 'ID da unidade correspondente',
+  })
+  @IsNumber()
+  storeId: number;
 }

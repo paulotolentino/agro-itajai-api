@@ -165,10 +165,62 @@ async function main() {
       id: 4,
     },
   });
-  await prisma.settings.create({
-    data: {
+  await prisma.store.upsert({
+    create: {
+      id: 1,
+      name: 'Loja 1 - Itajaí',
+    },
+    update: {
+      name: 'Loja 1 - Itajaí',
+    },
+    where: {
+      id: 2,
+    },
+  });
+  await prisma.store.upsert({
+    create: {
+      id: 2,
+      name: 'Loja 2 - Novo Maracanã',
+    },
+    update: {
+      name: 'Loja 2 - Novo Maracanã',
+    },
+    where: {
+      id: 2,
+    },
+  });
+  await prisma.store.upsert({
+    create: {
+      id: 2,
+      name: 'Loja 2 - Novo Maracanã',
+    },
+    update: {
+      name: 'Loja 2 - Novo Maracanã',
+    },
+    where: {
+      id: 2,
+    },
+  });
+  await prisma.settings.upsert({
+    create: {
       id: 1,
       daysToExpireDebit: 40,
+      storeId: 1,
+    },
+    update: {},
+    where: {
+      id: 1,
+    },
+  });
+  await prisma.settings.upsert({
+    create: {
+      id: 2,
+      daysToExpireDebit: 40,
+      storeId: 2,
+    },
+    update: {},
+    where: {
+      id: 2,
     },
   });
 }

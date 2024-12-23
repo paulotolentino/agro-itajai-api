@@ -31,6 +31,7 @@ export class StockEntriesService {
               oldPrice: product.price,
               productId: product.id,
               oldCost: product.cost,
+              storeId: product.storeId,
             },
           });
         }
@@ -44,6 +45,7 @@ export class StockEntriesService {
             totalCost: roundToTwo(
               createStockEntryDto.quantity * createStockEntryDto.unitCost,
             ),
+            storeId: product.storeId,
           },
         });
         const newQuantity = product.stock + createStockEntryDto.quantity;
@@ -52,17 +54,11 @@ export class StockEntriesService {
             createStockEntryDto.quantity * createStockEntryDto.unitCost) /
             newQuantity,
         );
-        const averagePrice = roundToTwo(
-          (product.stock * product.averagePrice +
-            createStockEntryDto.quantity * createStockEntryDto.unitPrice) /
-            newQuantity,
-        );
         await tx.product.update({
           where: { id: product.id },
           data: {
             stock: newQuantity,
             averageCost,
-            averagePrice,
             cost: createStockEntryDto.unitCost,
             price: createStockEntryDto.unitPrice,
           },
@@ -81,6 +77,13 @@ export class StockEntriesService {
   async findAll() {
     return await this.prismaService.stockEntry.findMany({
       include: { Product: true, CreatedBy: createdBy },
+    });
+  }
+
+  async findAllByStoreId(id: number) {
+    return await this.prismaService.stockEntry.findMany({
+      include: { Product: true, CreatedBy: createdBy },
+      where: { storeId: id },
     });
   }
 

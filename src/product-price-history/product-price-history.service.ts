@@ -18,12 +18,22 @@ export class ProductPriceHistoryService {
       throw new NotFoundException('Product not found');
     }
 
-    return await this.prismaService.productPriceHistory.create({
-      data: {
-        ...createProductPriceHistoryDto,
-        oldCost: product.cost,
-        oldPrice: product.price,
-      },
+    return await this.prismaService.$transaction(async (tx) => {
+      await tx.product.update({
+        where: { id: product.id },
+        data: {
+          cost: createProductPriceHistoryDto.newCost,
+          price: createProductPriceHistoryDto.newPrice,
+        },
+      });
+
+      return await tx.productPriceHistory.create({
+        data: {
+          ...createProductPriceHistoryDto,
+          oldCost: product.cost,
+          oldPrice: product.price,
+        },
+      });
     });
   }
 

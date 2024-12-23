@@ -16,6 +16,7 @@ export class AuthGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
     const authHeader = request.headers['authorization'];
+    const unitId = request.headers['x-unit-id'];
 
     if (!authHeader) {
       throw new UnauthorizedException('Authorization header not found');
@@ -34,6 +35,7 @@ export class AuthGuard implements CanActivate {
     try {
       const decoded = this.jwtService.verify(token);
       request.user = { ...decoded, id: decoded.sub };
+      request.storeId = +unitId;
       return true;
     } catch (err) {
       throw new UnauthorizedException('Invalid or expired token');

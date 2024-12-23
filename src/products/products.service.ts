@@ -26,13 +26,15 @@ export class ProductsService {
           description: createProductDto.description,
           price: createProductDto.price,
           cost: createProductDto.cost,
-          averagePrice: createProductDto.price,
+          averagePrice: 0,
           averageCost: createProductDto.cost,
+          measureUnit: createProductDto.measureUnit,
           brandId: brand.id,
           categoryId: category.id,
           createdById: createProductDto.createdById,
           stock: createProductDto.stock,
           active: true,
+          storeId: createProductDto.storeId,
         },
       });
 
@@ -44,6 +46,7 @@ export class ProductsService {
           oldCost: createProductDto.cost,
           oldPrice: createProductDto.price,
           createdById: createProductDto.createdById,
+          storeId: createProductDto.storeId,
         },
       });
 
@@ -55,6 +58,7 @@ export class ProductsService {
           totalCost: roundToTwo(createProductDto.cost * createProductDto.stock),
           unitCost: createProductDto.cost,
           unitPrice: createProductDto.price,
+          storeId: createProductDto.storeId,
         },
       });
 
@@ -68,9 +72,48 @@ export class ProductsService {
         CreatedBy: createdBy,
         Brand: true,
         Category: true,
-        PriceHistory: true,
-        StockEntries: true,
+        PriceHistory: {
+          orderBy: {
+            createdAt: 'desc',
+          },
+        },
+        StockEntries: {
+          orderBy: {
+            createdAt: 'desc',
+          },
+        },
         Orders: true,
+      },
+      orderBy: {
+        name: 'asc',
+      },
+    });
+    return products;
+  }
+
+  async findAllByStoreId(id: number) {
+    const products = await this.prisma.product.findMany({
+      include: {
+        CreatedBy: createdBy,
+        Brand: true,
+        Category: true,
+        PriceHistory: {
+          orderBy: {
+            createdAt: 'desc',
+          },
+        },
+        StockEntries: {
+          orderBy: {
+            createdAt: 'desc',
+          },
+        },
+        Orders: true,
+      },
+      where: {
+        storeId: id,
+      },
+      orderBy: {
+        name: 'asc',
       },
     });
     return products;
@@ -121,6 +164,7 @@ export class ProductsService {
         categoryId: updateProductDto.categoryId,
         description: updateProductDto.description,
         name: updateProductDto.name,
+        measureUnit: updateProductDto.measureUnit,
       },
     });
   }

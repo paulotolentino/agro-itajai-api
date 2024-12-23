@@ -15,6 +15,8 @@ import { CashBalanceModule } from './cash-balance/cash-balance.module';
 import { OrderModule } from './order/order.module';
 import { OrderItemModule } from './order-item/order-item.module';
 import { DebitPaymentModule } from './debit-payment/debit-payment.module';
+import { StoreModule } from './store/store.module';
+import { StockOutModule } from './stock-out/stock-out.module';
 import secretsConfig from './secretsConfig';
 
 const jwtConfig = secretsConfig().jwt;
@@ -40,6 +42,8 @@ const jwtConfig = secretsConfig().jwt;
     OrderModule,
     OrderItemModule,
     DebitPaymentModule,
+    StoreModule,
+    StockOutModule,
   ],
 })
 export class AppModule {}

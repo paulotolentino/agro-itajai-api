@@ -15,14 +15,14 @@ export class CategoriesService {
 
   async findAll() {
     return await this.prismaService.category.findMany({
-      include: { CreatedBy: createdBy, Products: true },
+      include: { CreatedBy: createdBy, Products: true, Store: true },
     });
   }
 
   async findOne(id: number) {
     const product = await this.prismaService.category.findUnique({
       where: { id },
-      include: { CreatedBy: createdBy, Products: true },
+      include: { CreatedBy: createdBy, Products: true, Store: true },
     });
 
     if (!product) {

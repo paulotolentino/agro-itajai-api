@@ -29,10 +29,11 @@ export class CategoriesController {
     @Body() createCategoryDto: CreateCategoryDto,
     @Req() req: AuthorizedRequest,
   ) {
-    const user = req.user; // Pega o usuário anexado à request (via guard ou middleware)
+    const { user, storeId } = req; // Pega o usuário anexado à request (via guard ou middleware)
     return this.categoriesService.create({
       ...createCategoryDto,
       createdById: user.id,
+      storeId,
     });
   }
 

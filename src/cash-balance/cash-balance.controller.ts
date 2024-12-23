@@ -29,10 +29,11 @@ export class CashBalanceController {
     @Body() createCashBalanceDto: CreateCashBalanceDto,
     @Req() req: AuthorizedRequest,
   ) {
-    const user = req.user; // Pega o usuário anexado à request (via guard ou middleware)
+    const { user, storeId } = req; // Pega o usuário anexado à request (via guard ou middleware)
     return this.cashBalanceService.create({
       ...createCashBalanceDto,
       createdById: user.id,
+      storeId,
     });
   }
 
@@ -40,6 +41,13 @@ export class CashBalanceController {
   @Get()
   findAll() {
     return this.cashBalanceService.findAll();
+  }
+
+  @ApiOperation({ summary: 'Busca todos os caixas de uma unidade' })
+  @Get('store')
+  findAllByStoreId(@Req() req: AuthorizedRequest) {
+    const { storeId } = req;
+    return this.cashBalanceService.findAllByStoreId(storeId);
   }
 
   @ApiOperation({ summary: 'Busca um caixa pelo ID' })
