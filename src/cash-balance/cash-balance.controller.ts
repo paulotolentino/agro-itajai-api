@@ -44,7 +44,7 @@ export class CashBalanceController {
   }
 
   @ApiOperation({ summary: 'Busca todos os caixas de uma unidade' })
-  @Get('store')
+  @Get('store/cash-balance')
   findAllByStoreId(@Req() req: AuthorizedRequest) {
     const { storeId } = req;
     return this.cashBalanceService.findAllByStoreId(storeId);

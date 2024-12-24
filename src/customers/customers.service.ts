@@ -23,9 +23,20 @@ export class CustomersService {
     const customers = await this.prismaService.customer.findMany({
       include: {
         CreatedBy: createdBy,
-        DebitPayment: true,
-        Orders: true,
+        DebitPayment: {
+          include: {
+            CreatedBy: createdBy,
+            Store: true,
+          },
+        },
+        Orders: {
+          include: {
+            CreatedBy: createdBy,
+            Store: true,
+          },
+        },
         Status: true,
+        Store: true,
       },
       orderBy: {
         name: 'asc',

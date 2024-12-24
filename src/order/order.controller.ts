@@ -44,7 +44,7 @@ export class OrderController {
   }
 
   @ApiOperation({ summary: 'Busca todas as vendas de uma unidade' })
-  @Get('store')
+  @Get('store/order')
   findAllByStoreId(@Req() req: AuthorizedRequest) {
     const { storeId } = req;
     return this.orderService.findAllByStoreId(storeId);

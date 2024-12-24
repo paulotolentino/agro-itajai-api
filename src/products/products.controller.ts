@@ -44,7 +44,7 @@ export class ProductsController {
   }
 
   @ApiOperation({ summary: 'Busca todos os produtos' })
-  @Get('store')
+  @Get('store/products')
   findAllByStoreId(@Req() req: AuthorizedRequest) {
     const { storeId } = req;
     return this.productsService.findAllByStoreId(storeId);

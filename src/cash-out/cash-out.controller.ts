@@ -44,7 +44,7 @@ export class CashOutController {
   }
 
   @ApiOperation({ summary: 'Busca todas as saídas de caixa de uma unidade' })
-  @Get('store')
+  @Get('store/cash-out')
   findAllByStoreId(@Req() req: AuthorizedRequest) {
     const { storeId } = req;
     return this.cashOutService.findAllByStoreId(storeId);
