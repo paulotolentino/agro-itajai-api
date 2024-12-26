@@ -60,6 +60,8 @@ export class OrderService {
           data: {
             ...orderItem,
             orderId: order.id,
+            unitCost: items.find((item) => item.id === orderItem.productId)
+              .cost,
             unitPrice: items.find((item) => item.id === orderItem.productId)
               .price,
           },
@@ -153,6 +155,9 @@ export class OrderService {
       },
       where: {
         storeId,
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
     });
   }

@@ -63,11 +63,12 @@ export class OrderController {
   }
 
   @ApiOperation({ summary: 'Busca todas as vendas pela data' })
-  @Get('date/:date/store/:storeId')
+  @Get('date/:date/order')
   findAllByDateAndStoreId(
     @Param('date') date: string,
-    @Param('storeId') storeId: string,
+    @Req() req: AuthorizedRequest,
   ) {
+    const { storeId } = req;
     return this.orderService.findAllByDateAndStoreId(date, +storeId);
   }
 
