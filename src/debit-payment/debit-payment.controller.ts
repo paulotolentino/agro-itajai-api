@@ -29,10 +29,11 @@ export class DebitPaymentController {
     @Body() createDebitPaymentDto: CreateDebitPaymentDto,
     @Req() req: AuthorizedRequest,
   ) {
-    const user = req.user;
+    const { user, storeId } = req;
     return this.debitPaymentService.create({
       ...createDebitPaymentDto,
       createdById: user.id,
+      storeId,
     });
   }
 

@@ -9,12 +9,11 @@ import { roundToTwo } from 'src/utils/money';
 export class CustomersService {
   constructor(private prismaService: PrismaService) {}
   async create(createCustomerDto: CreateCustomerDto) {
-    const userData = {
-      ...createCustomerDto,
-      statusId: 1, // Status de usuário ativo
-    };
     const customer = await this.prismaService.customer.create({
-      data: userData,
+      data: {
+        ...createCustomerDto,
+        statusId: 1,
+      },
     });
 
     return customer;
@@ -24,9 +23,23 @@ export class CustomersService {
     const customers = await this.prismaService.customer.findMany({
       include: {
         CreatedBy: createdBy,
-        DebitPayment: true,
-        Orders: true,
+        DebitPayment: {
+          include: {
+            CreatedBy: createdBy,
+            Store: true,
+          },
+        },
+        Orders: {
+          include: {
+            CreatedBy: createdBy,
+            Store: true,
+          },
+        },
         Status: true,
+        Store: true,
+      },
+      orderBy: {
+        name: 'asc',
       },
     });
 
@@ -75,16 +88,17 @@ export class CustomersService {
     const debitsPaid = customer.DebitPayment.filter(
       (payment) => !payment.arquivedDate,
     );
-    const totalDebitPaid = debitsPaid.reduce(
-      (acc, payment) => acc + payment.amount,
-      0,
+    const totalDebitPaid = roundToTwo(
+      debitsPaid.reduce((acc, payment) => acc + payment.amount, 0),
     );
     const debits = customer.Orders.filter(
       (order) =>
         (order.statusId === 2 || order.statusId === 4) &&
         order.paymentTypeId === 5,
     );
-    const totalDebit = debits.reduce((acc, order) => acc + order.total, 0);
+    const totalDebit = roundToTwo(
+      debits.reduce((acc, order) => acc + order.total, 0),
+    );
 
     return {
       ...customer,

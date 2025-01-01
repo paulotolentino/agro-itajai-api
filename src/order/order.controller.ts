@@ -29,10 +29,11 @@ export class OrderController {
     @Body() createOrderDto: CreateOrderDto,
     @Req() req: AuthorizedRequest,
   ) {
-    const user = req.user;
+    const { user, storeId } = req;
     return this.orderService.create({
       ...createOrderDto,
       createdById: user.id,
+      storeId,
     });
   }
 
@@ -40,6 +41,13 @@ export class OrderController {
   @Get()
   findAll() {
     return this.orderService.findAll();
+  }
+
+  @ApiOperation({ summary: 'Busca todas as vendas de uma unidade' })
+  @Get('store/order')
+  findAllByStoreId(@Req() req: AuthorizedRequest) {
+    const { storeId } = req;
+    return this.orderService.findAllByStoreId(storeId);
   }
 
   @ApiOperation({ summary: 'Busca uma venda pelo ID' })
@@ -52,6 +60,16 @@ export class OrderController {
   @Get('date/:date')
   findAllByDate(@Param('date') date: string) {
     return this.orderService.findAllByDate(date);
+  }
+
+  @ApiOperation({ summary: 'Busca todas as vendas pela data' })
+  @Get('date/:date/order')
+  findAllByDateAndStoreId(
+    @Param('date') date: string,
+    @Req() req: AuthorizedRequest,
+  ) {
+    const { storeId } = req;
+    return this.orderService.findAllByDateAndStoreId(date, +storeId);
   }
 
   @ApiOperation({ summary: 'Atualiza uma venda pelo ID' })

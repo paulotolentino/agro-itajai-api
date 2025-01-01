@@ -18,6 +18,10 @@ export class DebitPaymentService {
     const customer = await this.customersService.findOne(
       createDebitPaymentDto.customerId,
     );
+    const cashBalance = await this.cashBalanceService.findByDate(
+      new Date(),
+      createDebitPaymentDto.storeId,
+    );
     const customerDebitValue = customer.totalDebit;
     const customerDebit = customer.debits;
 
@@ -31,6 +35,9 @@ export class DebitPaymentService {
             amount: createDebitPaymentDto.amount,
             createdById: createDebitPaymentDto.createdById,
             arquivedDate: formatDate(new Date()),
+            paymentDate: formatDate(createDebitPaymentDto.date),
+            storeId: createDebitPaymentDto.storeId,
+            cashBalanceId: cashBalance.id,
           },
         });
 
@@ -77,6 +84,9 @@ export class DebitPaymentService {
           customerId: customer.id,
           amount: createDebitPaymentDto.amount,
           createdById: createDebitPaymentDto.createdById,
+          paymentDate: formatDate(createDebitPaymentDto.date),
+          storeId: createDebitPaymentDto.storeId,
+          cashBalanceId: cashBalance.id,
         },
       });
 
@@ -101,6 +111,8 @@ export class DebitPaymentService {
       include: {
         CreatedBy: createdBy,
         Customer: true,
+        CashBalance: true,
+        Store: true,
       },
     });
 
@@ -114,6 +126,11 @@ export class DebitPaymentService {
   async findByCustomerId(customerId: number) {
     await this.customersService.findOne(customerId);
     return await this.prismaService.debitPayment.findMany({
+      include: {
+        CreatedBy: createdBy,
+        CashBalance: true,
+        Store: true,
+      },
       where: {
         customerId,
         arquivedDate: null,

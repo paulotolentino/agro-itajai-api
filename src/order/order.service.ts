@@ -28,7 +28,7 @@ export class OrderService {
       this.procutsService.findAllByIds(
         createOrderDto.orderItems.map((orderItem) => orderItem.productId),
       ),
-      this.cashBalanceService.findByDate(date),
+      this.cashBalanceService.findByDate(date, createOrderDto.storeId),
     ]);
     if (cashBalance.closed) {
       throw new ConflictException('Cash balance is closed');
@@ -43,6 +43,7 @@ export class OrderService {
           date,
           cashBalanceId: cashBalance.id,
           customerId: customer.id,
+          storeId: createOrderDto.storeId,
           total: roundToTwo(
             items.reduce((acc, item) => {
               const orderItem = createOrderDto.orderItems.find(
@@ -59,18 +60,52 @@ export class OrderService {
           data: {
             ...orderItem,
             orderId: order.id,
+            unitCost: items.find((item) => item.id === orderItem.productId)
+              .cost,
             unitPrice: items.find((item) => item.id === orderItem.productId)
               .price,
           },
         });
       });
 
-      const updateStock = createOrderDto.orderItems.map((orderItem) => {
+      const updateStock = createOrderDto.orderItems.map(async (orderItem) => {
+        const orderItemsHistory = await tx.orderItem.findMany({
+          where: {
+            productId: orderItem.productId,
+          },
+          include: {
+            Product: true,
+          },
+        });
+
+        const averageSoldPrice = orderItemsHistory.reduce((acc, history) => {
+          return acc + history.unitPrice * history.quantity;
+        }, 0);
+
+        const sumSoldQuantity = orderItemsHistory.reduce((acc, history) => {
+          return acc + history.quantity;
+        }, 0);
+
+        // Se não houver histórico de vendas, o preço médio é o preço atual do produto
+        // Senão, calcula-se a média ponderada do preço de venda,
+        const averagePrice =
+          sumSoldQuantity === 0
+            ? items.find((item) => item.id === orderItem.productId).price
+            : roundToTwo(
+                (averageSoldPrice +
+                  orderItem.quantity *
+                    orderItemsHistory.find(
+                      (item) => item.productId === orderItem.productId,
+                    ).Product.price) /
+                  (sumSoldQuantity + orderItem.quantity),
+              );
+
         return tx.product.update({
           where: {
             id: orderItem.productId,
           },
           data: {
+            averagePrice,
             stock: {
               decrement: orderItem.quantity,
             },
@@ -108,6 +143,25 @@ export class OrderService {
     });
   }
 
+  async findAllByStoreId(storeId: number) {
+    return await this.prismaService.order.findMany({
+      include: {
+        CreatedBy: createdBy,
+        Customer: true,
+        Items: true,
+        CashBalance: true,
+        Status: true,
+        PaymentType: true,
+      },
+      where: {
+        storeId,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
+
   async findAllByDate(dateToSearchFor: Date | string) {
     const date = formatDate(dateToSearchFor);
     return await this.prismaService.order.findMany({
@@ -118,6 +172,31 @@ export class OrderService {
         CreatedBy: createdBy,
         Customer: true,
         Items: true,
+        CashBalance: true,
+        Status: true,
+        PaymentType: true,
+      },
+    });
+  }
+
+  async findAllByDateAndStoreId(
+    dateToSearchFor: Date | string,
+    storeId: number,
+  ) {
+    const date = formatDate(dateToSearchFor);
+    return await this.prismaService.order.findMany({
+      where: {
+        date,
+        storeId,
+      },
+      include: {
+        CreatedBy: createdBy,
+        Customer: true,
+        Items: {
+          include: {
+            Product: true,
+          },
+        },
         CashBalance: true,
         Status: true,
         PaymentType: true,

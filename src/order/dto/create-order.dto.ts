@@ -16,10 +16,6 @@ export class CreateOrderDto {
   @IsNumber()
   discount: number;
 
-  @ApiProperty({ example: 1, description: 'Id do status' })
-  @IsNumber()
-  statusId: number;
-
   @ApiProperty({ example: 1, description: 'Id do tipo do pagamento' })
   @IsNumber()
   paymentTypeId: number;
@@ -27,4 +23,11 @@ export class CreateOrderDto {
   @ApiProperty({ example: '2021-01-01', description: 'Data do pedido' })
   @IsDate()
   date: Date;
+
+  @ApiProperty({
+    example: 2,
+    description: 'ID da unidade correspondente',
+  })
+  @IsNumber()
+  storeId: number;
 }

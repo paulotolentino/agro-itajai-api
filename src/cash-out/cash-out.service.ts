@@ -23,6 +23,7 @@ export class CashOutService {
           description: createCashOutDto.description,
           createdById: createCashOutDto.createdById,
           cashBalanceId: cashBalance.id,
+          storeId: createCashOutDto.storeId,
         },
       });
 
@@ -42,6 +43,15 @@ export class CashOutService {
   async findAll() {
     return await this.prismaService.cashOut.findMany({
       include: { CreatedBy: createdBy, CashBalance: true },
+    });
+  }
+
+  async findAllByStoreId(id: number) {
+    return await this.prismaService.cashOut.findMany({
+      include: { CreatedBy: createdBy, CashBalance: true },
+      where: {
+        storeId: id,
+      },
     });
   }
 

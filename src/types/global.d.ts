@@ -3,4 +3,5 @@ export interface AuthorizedRequest {
     username: string;
     id: number;
   };
+  storeId?: number;
 }

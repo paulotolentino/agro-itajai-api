@@ -18,7 +18,7 @@ export class BrandsService {
 
   async findAll() {
     const brands = await this.prismaService.brand.findMany({
-      include: { Products: true, CreatedBy: createdBy },
+      include: { Products: true, CreatedBy: createdBy, Store: true },
     });
     return brands;
   }
@@ -26,7 +26,7 @@ export class BrandsService {
   async findOne(id: number) {
     const brand = await this.prismaService.brand.findUnique({
       where: { id },
-      include: { Products: true, CreatedBy: createdBy },
+      include: { Products: true, CreatedBy: createdBy, Store: true },
     });
 
     if (!brand) {

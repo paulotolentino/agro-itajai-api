@@ -29,10 +29,11 @@ export class CashInController {
     @Body() createCashInDto: CreateCashInDto,
     @Req() req: AuthorizedRequest,
   ) {
-    const user = req.user; // Pega o usuário anexado à request (via guard ou middleware)
+    const { user, storeId } = req; // Pega o usuário anexado à request (via guard ou middleware)
     return this.cashInService.create({
       ...createCashInDto,
       createdById: user.id,
+      storeId,
     });
   }
 
@@ -40,6 +41,13 @@ export class CashInController {
   @Get()
   findAll() {
     return this.cashInService.findAll();
+  }
+
+  @ApiOperation({ summary: 'Busca todas as entradas de caixa de uma unidade' })
+  @Get('store/cash-in')
+  findAllByStoreId(@Req() req: AuthorizedRequest) {
+    const { storeId } = req;
+    return this.cashInService.findAllByStoreId(storeId);
   }
 
   @ApiOperation({ summary: 'Busca uma entrada de caixa pelo ID' })

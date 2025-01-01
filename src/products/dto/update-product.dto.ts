@@ -17,21 +17,15 @@ export class UpdateProductDto {
   })
   description?: string;
 
-  @ApiProperty({ example: 100, description: 'Valor de venda do produto' })
-  @IsNumber()
-  price: number;
-
-  @ApiProperty({ example: 50, description: 'Valor de custo do produto' })
-  @IsNumber()
-  cost: number;
+  @ApiProperty({
+    example: 'kg',
+    description: 'Unidade de medida do produto',
+  })
+  measureUnit?: string;
 
   @ApiProperty({ example: 1, description: 'ID da marca' })
   @IsNumber()
   brandId: number;
-
-  @ApiProperty({ example: 15, description: 'Quantidade comprada' })
-  @IsNumber()
-  stock: number;
 
   @ApiProperty({ example: true, description: 'Produto ativo ou inativo' })
   @IsNumber()

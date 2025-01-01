@@ -17,6 +17,12 @@ export class CreateProductDto {
   })
   description?: string;
 
+  @ApiProperty({
+    example: 'kg',
+    description: 'Unidade de medida do produto',
+  })
+  measureUnit?: string;
+
   @ApiProperty({ example: 100, description: 'Valor de venda do produto' })
   @IsNumber()
   price: number;
@@ -40,4 +46,11 @@ export class CreateProductDto {
   @ApiProperty({ example: 1, description: 'ID da categoria' })
   @IsNumber()
   categoryId: number;
+
+  @ApiProperty({
+    example: 2,
+    description: 'ID da unidade correspondente',
+  })
+  @IsNumber()
+  storeId: number;
 }

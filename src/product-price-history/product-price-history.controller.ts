@@ -33,10 +33,11 @@ export class ProductPriceHistoryController {
     @Body() createProductPriceHistoryDto: CreateProductPriceHistoryDto,
     @Req() req: AuthorizedRequest,
   ) {
-    const user = req.user; // Pega o usuário anexado à request (via guard ou middleware)
+    const { user, storeId } = req; // Pega o usuário anexado à request (via guard ou middleware)
     return this.productPriceHistoryService.create({
       ...createProductPriceHistoryDto,
       createdById: user.id,
+      storeId,
     });
   }
 

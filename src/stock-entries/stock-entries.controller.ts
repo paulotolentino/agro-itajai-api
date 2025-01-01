@@ -29,10 +29,11 @@ export class StockEntriesController {
     @Body() createStockEntryDto: CreateStockEntryDto,
     @Req() req: AuthorizedRequest,
   ) {
-    const user = req.user; // Pega o usuário anexado à request (via guard ou middleware)
+    const { user, storeId } = req; // Pega o usuário anexado à request (via guard ou middleware)
     return this.stockEntriesService.create({
       ...createStockEntryDto,
       createdById: user.id,
+      storeId,
     });
   }
 
@@ -40,6 +41,14 @@ export class StockEntriesController {
   @Get()
   findAll() {
     return this.stockEntriesService.findAll();
+  }
+
+  @ApiOperation({
+    summary: 'Busca todas as entradas no estoque de uma unidade',
+  })
+  @Get('store/:id')
+  findAllByStoreId(@Param('id') id: string) {
+    return this.stockEntriesService.findAllByStoreId(+id);
   }
 
   @ApiOperation({ summary: 'Busca todas as entradas no estoque de um produto' })

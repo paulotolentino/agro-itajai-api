@@ -4,7 +4,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export class CreateStockEntryDto {
   createdById: number;
 
-  @ApiProperty({ example: 1, description: 'ID da categoria' })
+  @ApiProperty({ example: 1, description: 'ID do produto' })
   @IsNumber()
   productId: number;
 
@@ -25,4 +25,11 @@ export class CreateStockEntryDto {
   })
   @IsNumber()
   unitPrice: number;
+
+  @ApiProperty({
+    example: 2,
+    description: 'ID da unidade correspondente',
+  })
+  @IsNumber()
+  storeId: number;
 }

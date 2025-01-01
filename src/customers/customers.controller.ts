@@ -29,10 +29,11 @@ export class CustomersController {
     @Body() createCustomerDto: CreateCustomerDto,
     @Req() req: AuthorizedRequest,
   ) {
-    const { user } = req;
+    const { user, storeId } = req;
     return this.customersService.create({
       ...createCustomerDto,
       createdById: user.id,
+      storeId,
     });
   }
 

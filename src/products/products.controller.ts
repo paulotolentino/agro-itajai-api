@@ -29,10 +29,11 @@ export class ProductsController {
     @Body() createProductDto: CreateProductDto,
     @Req() req: AuthorizedRequest,
   ) {
-    const user = req.user; // Pega o usuário anexado à request (via guard ou middleware)
+    const { user, storeId } = req; // Pega o usuário anexado à request (via guard ou middleware)
     return this.productsService.create({
       ...createProductDto,
       createdById: user.id,
+      storeId,
     });
   }
 
@@ -40,6 +41,13 @@ export class ProductsController {
   @Get()
   findAll() {
     return this.productsService.findAll();
+  }
+
+  @ApiOperation({ summary: 'Busca todos os produtos' })
+  @Get('store/products')
+  findAllByStoreId(@Req() req: AuthorizedRequest) {
+    const { storeId } = req;
+    return this.productsService.findAllByStoreId(storeId);
   }
 
   @ApiOperation({ summary: 'Busca um produto pelo ID' })
