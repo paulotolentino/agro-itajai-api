@@ -192,7 +192,11 @@ export class OrderService {
       include: {
         CreatedBy: createdBy,
         Customer: true,
-        Items: true,
+        Items: {
+          include: {
+            Product: true,
+          },
+        },
         CashBalance: true,
         Status: true,
         PaymentType: true,

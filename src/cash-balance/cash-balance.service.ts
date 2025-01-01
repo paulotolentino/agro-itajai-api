@@ -9,6 +9,27 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { createdBy } from 'src/utils/createdByUser';
 import { formatDate } from 'src/utils/date';
 
+const orderPattern = {
+  CreatedBy: createdBy,
+  CashIns: true,
+  CashOuts: true,
+  Orders: {
+    include: {
+      PaymentType: true,
+      Items: {
+        include: {
+          Product: true,
+        },
+      },
+    },
+  },
+  Store: true,
+  DebitPayment: {
+    include: {
+      Customer: true,
+    },
+  },
+};
 @Injectable()
 export class CashBalanceService {
   constructor(private prismaService: PrismaService) {}
@@ -68,18 +89,7 @@ export class CashBalanceService {
 
   async findAll() {
     const cashBalances = await this.prismaService.cashBalance.findMany({
-      include: {
-        CreatedBy: createdBy,
-        CashIns: true,
-        CashOuts: true,
-        Orders: true,
-        Store: true,
-        DebitPayment: {
-          include: {
-            Customer: true,
-          },
-        },
-      },
+      include: orderPattern,
     });
     return cashBalances;
   }
@@ -87,44 +97,13 @@ export class CashBalanceService {
   async findLast3AndNotClosedByStoreId(storeId: number) {
     // TODO validar se a query está correta
     const openCashBalances = await this.prismaService.cashBalance.findMany({
-      include: {
-        CreatedBy: true,
-        CashIns: true,
-        CashOuts: true,
-        Orders: {
-          include: {
-            PaymentType: true,
-            Items: {
-              include: {
-                Product: true,
-              },
-            },
-          },
-        },
-        Store: true,
-        DebitPayment: {
-          include: {
-            Customer: true,
-          },
-        },
-      },
+      include: orderPattern,
       where: { closed: false, storeId },
       orderBy: { date: 'desc' }, // Opcional, dependendo da ordem desejada
     });
 
     const closedCashBalances = await this.prismaService.cashBalance.findMany({
-      include: {
-        CreatedBy: true,
-        CashIns: true,
-        CashOuts: true,
-        Orders: true,
-        Store: true,
-        DebitPayment: {
-          include: {
-            Customer: true,
-          },
-        },
-      },
+      include: orderPattern,
       where: { closed: true, storeId },
       take: 3,
       orderBy: { date: 'desc' },
@@ -137,18 +116,7 @@ export class CashBalanceService {
 
   async findAllByStoreId(id: number) {
     const cashBalances = await this.prismaService.cashBalance.findMany({
-      include: {
-        CreatedBy: createdBy,
-        CashIns: true,
-        CashOuts: true,
-        Orders: true,
-        Store: true,
-        DebitPayment: {
-          include: {
-            Customer: true,
-          },
-        },
-      },
+      include: orderPattern,
       where: { storeId: id },
       orderBy: { date: 'desc' },
     });
@@ -157,18 +125,7 @@ export class CashBalanceService {
 
   async findAllByStoreIdByMonthYear(storeId: number, date: Date) {
     const cashBalances = await this.prismaService.cashBalance.findMany({
-      include: {
-        CreatedBy: createdBy,
-        CashIns: true,
-        CashOuts: true,
-        Orders: true,
-        Store: true,
-        DebitPayment: {
-          include: {
-            Customer: true,
-          },
-        },
-      },
+      include: orderPattern,
       where: {
         storeId,
         date: {
@@ -184,13 +141,7 @@ export class CashBalanceService {
   async findOne(id: number) {
     const cashBalance = await this.prismaService.cashBalance.findUnique({
       where: { id },
-      include: {
-        CreatedBy: createdBy,
-        CashIns: true,
-        CashOuts: true,
-        Orders: true,
-        Store: true,
-      },
+      include: orderPattern,
     });
 
     if (!cashBalance) {
@@ -257,12 +208,7 @@ export class CashBalanceService {
     const date = formatDate(dateToSearchFor);
     const cashBalance = await this.prismaService.cashBalance.findFirst({
       where: { date, storeId },
-      include: {
-        CreatedBy: createdBy,
-        CashIns: true,
-        CashOuts: true,
-        Store: true,
-      },
+      include: orderPattern,
     });
 
     if (!cashBalance) {
