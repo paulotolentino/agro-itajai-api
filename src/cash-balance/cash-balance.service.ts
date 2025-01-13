@@ -153,12 +153,15 @@ export class CashBalanceService {
   // get month profit
   async profit(storeId: number, monthYear: Date) {
     const date = new Date(monthYear);
+    date.setHours(date.getHours() + 3);
+    const gte = new Date(date.getFullYear(), date.getMonth(), 1);
+    const lt = new Date(date.getFullYear(), date.getMonth() + 1, 1);
     const cashBalances = await this.prismaService.cashBalance.findMany({
       where: {
         storeId,
         date: {
-          gte: new Date(date.getFullYear(), date.getMonth(), 1),
-          lt: new Date(date.getFullYear(), date.getMonth() + 1, 1),
+          gte,
+          lt,
         },
       },
       include: {

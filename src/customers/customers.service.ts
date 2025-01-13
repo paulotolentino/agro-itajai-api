@@ -33,6 +33,13 @@ export class CustomersService {
           include: {
             CreatedBy: createdBy,
             Store: true,
+            Customer: true,
+            PaymentType: true,
+            Items: {
+              include: {
+                Product: true,
+              },
+            },
           },
         },
         Status: true,
